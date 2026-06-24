@@ -1,0 +1,77 @@
+:root {
+    --ms-card-radius: 0.75rem;
+}
+
+body.ms-body {
+    min-height: 100vh;
+}
+
+body.ms-login {
+    background: radial-gradient(circle at top, rgba(13, 110, 253, 0.12), transparent 45%);
+}
+
+.ms-login-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: var(--ms-card-radius);
+}
+
+.ms-card,
+.ms-stat {
+    border-radius: var(--ms-card-radius);
+}
+
+.ms-stat .card-body {
+    min-height: 88px;
+}
+
+.ms-pre {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--bs-body-color);
+    background: var(--bs-tertiary-bg);
+    padding: 0.85rem 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.ms-pre-scroll {
+    max-height: 320px;
+    overflow: auto;
+}
+
+.ms-chart-wrap {
+    position: relative;
+    height: 220px;
+}
+
+.ms-popup .ms-pre {
+    min-height: 100%;
+}
+
+[data-bs-theme="dark"] .navbar,
+[data-bs-theme="dark"] .card {
+    --bs-card-bg: #171a21;
+}
+
+[data-bs-theme="dark"] .ms-whm-wrap,
+html[data-bs-theme="dark"] body {
+    color-scheme: dark;
+}
+
+.ms-whm-toolbar {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 20;
+}
+
+[data-bs-theme="light"] body.ms-body {
+    background: #f4f6f9;
+}
+
+@media (max-width: 767.98px) {
+    .ms-pre-scroll {
+        max-height: 240px;
+    }
+}

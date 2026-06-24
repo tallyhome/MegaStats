@@ -1,0 +1,48 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+body {
+	background-color: #000000;
+	color: #CCCCCC;
+	margin: 0;
+	padding: 0;
+}
+#scroll {
+	clear: both;
+	overflow: auto;
+	border: none;
+	margin: 0;
+	padding: 0;
+	overflow-Y: auto;
+	overflow-X: visible;
+	scrollbar-face-color: #666666;
+	scrollbar-track-color: #999999;
+	scrollbar-3dlight-color: #999999;
+	scrollbar-highlight-color: #666666;
+}
+div.title {
+	float: left;
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	background-color: #333333;
+	color: #DDDDDD;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 4px 0 2px 6px;
+}
+div.commands {
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	background-color: #333333;
+	text-align: right;
+	font-size: 13px;
+	padding: 4px 10px 5px 0;
+	border-bottom: 1px solid #666666;
+}
+.button {
+	width: 60px;
+	font-size: 11px;
+	border: 1px solid #999999;
+	background-color: #666666;
+	color: #FFFFFF;
+}

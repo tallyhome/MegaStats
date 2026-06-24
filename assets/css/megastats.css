@@ -1,0 +1,235 @@
+BODY {
+	font-family: Verdana,Arial,Helvetica,sans-serif;
+	background-color: #31311B;
+	color: #CCCCCC;
+	margin: 5px 5px 30px 5px;
+	padding: 0;
+}
+
+div.space {
+	font-size: 1px;
+	height: 3px;
+}
+td.head {
+	border: 1px solid #666666;
+	background-color: #000000;
+}
+td.tdleft {
+}
+td.tdright {
+	padding-left: 5px;
+}
+
+div.hostname {
+	font-size: 16px;
+	font-weight: bold;
+	color: #DDDDDD;
+	padding: 2px 0 2px 5px;
+}
+div.date {
+	font-size: 13px;
+	font-weight: bold;
+	color: #DDDDDD;
+	padding: 0 0 2px 5px;
+}
+div.head_label {
+	font-family: Tahoma,"MS Sans Serif",Arial,Helvetica,sans-serif;
+	font-size: 11px;
+	padding-left: 13px;
+	text-align: right;
+	cursor: help;
+}
+div.head_num {
+	font-size: 22px;
+	padding-left: 13px;
+	padding-right: 1px;
+	text-align: right;
+}
+div.head_num2 {
+	font-size: 18px;
+	padding-left: 13px;
+	padding-right: 1px;
+	text-align: right;
+}
+.head_units {
+	font-family: Tahoma,"MS Sans Serif",Arial,Helvetica,sans-serif;
+	font-size: 10px;
+	vertical-align : super;
+}
+div.head_sum {
+	font-family: Tahoma,"MS Sans Serif",Arial,Helvetica,sans-serif;
+	font-size: 11px;
+	padding: 1px 5px 2px 0;
+	text-align: right;
+}
+div.servstatus {
+	font-family: Tahoma,"MS Sans Serif",Arial,Helvetica,sans-serif;
+  font-size: 11px;
+	background-color: #333333;
+	padding: 2px 0 2px 2px;
+}
+span.servup {
+	background-color: #004000;
+	color: #CCCCCC;
+	cursor: help;
+}
+span.servdown {
+	background-color: #CC0000;
+	color: #FFFFFF;
+	cursor: help;
+}
+div.disk {
+	font-family: Tahoma,"MS Sans Serif",Arial,Helvetica,sans-serif;
+	font-size: 11px;
+	text-align: right;
+	background-color: #333333;
+	padding: 2px 5px 2px 0;
+}
+.warn {
+	background-color: #CC0000;
+}
+div.load_label {
+	height: 12px;
+	font-family: Tahoma,"MS Sans Serif",Arial,Helvetica,sans-serif;
+	font-size: 11px;
+	color: #CCCCCC;
+	line-height: 11px;
+	text-align: right;
+	cursor: help;
+}
+div.load_bg {
+	font-size: 2px;
+	height: 10px;
+	width: 200px;
+	cursor: help;
+}
+div.load_fg {
+	height: 10px;
+}
+
+div.subleft,div.subright {
+	font-size: 13px;
+	font-weight: bold;
+	background-color: #333333;
+	color: #DDDDDD;
+}
+div.subleft {
+	width: auto;
+	border: 1px solid #666666;
+	border-bottom: none;
+	margin-top: 5px;
+	padding: 0 0 3px 6px;
+}
+div.subright {
+	width: auto;
+	border: 1px solid #666666;
+	border-bottom: none;
+	margin-top: 5px;
+	padding: 0 0 3px 6px;
+}
+div.left {
+	clear: right;
+	margin: 0;
+	background-color: #000000;
+	border: 1px solid #666666;
+	border-top: none;
+}
+div.leftscroll {
+	clear: right;
+	height: 230px;
+	overflow: auto;
+	margin-right: -1px;
+	background-color: #000000;
+	border: 1px solid #666666;
+	border-bottom: 1px solid #444444;
+	border-top: none;
+	overflow-Y: auto;
+	overflow-X: visible;
+	scrollbar-face-color: #666666;
+	scrollbar-track-color: #999999;
+	scrollbar-3dlight-color: #999999;
+	scrollbar-highlight-color: #666666;
+}
+div.right,div.toolbar,div.toolbar_left {
+	width: auto;
+	background-color: #000000;
+	border: 1px solid #666666;
+	border-top: none;
+}
+div.toolbar {
+	border-top: none;
+	padding: 3px 5px 4px 0;
+	text-align: right;
+}
+div.toolbar_left {
+	border-top: none;
+	padding: 3px 0 4px 5px;
+	text-align: left;
+}
+
+div.subleftcmd {
+	text-align: right;
+	font-size: 10px;
+	line-height: 14px;
+	float: right;
+	margin-top: 5px;
+	margin-right: 0px;
+	padding-bottom: 1px;
+	border: 1px solid #777777;
+	border-top: none;
+	border-right: none;
+	background-color: #666666;
+}
+a:link.open, a:visited.open,a:active.open {
+	color: #EEEEEE;
+}
+
+.whois_title {
+	font-size: 13px;
+	font-weight: bold;
+	color: #BBBBBB;
+}
+form.whois {
+	margin: 0;
+	padding: 0;
+}
+input.whois_input {
+	width: 150px;
+	font-family: vt7X13,"Courier New",Courier,monospace;
+	font-size: 11px;
+	line-height: 13px;
+	border: 1px solid #999999;
+	background-color: #CCCCCC;
+}
+input.button {
+	width: 65px;
+	font-family: Tahoma,"MS Sans Serif",Arial,Helvetica,sans-serif;
+	font-size: 11px;
+	border: 1px solid #999999;
+	background-color: #666666;
+	color: #FFFFFF;
+	cursor: pointer;
+}
+
+pre {
+	font-family: vt7X13,"Courier New",Courier,monospace;
+	font-size: 11px;
+	line-height: 14px;
+	padding: 5px 5px 10px 6px;
+	margin: 0;
+}
+a:link, a:visited, a:active {
+	color: #BBBB00;
+	text-decoration: none;
+}
+div.note {
+	font-size: 11px;
+	font-style: italic;
+	padding: 5px 0 0 5px;
+}
+div.sig {
+	font-size: 11px;
+	color: #999999;
+	padding: 25px 0 0 0;
+	text-align: center;
+}
