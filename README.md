@@ -69,7 +69,7 @@ Voir [INSTALL.md](INSTALL.md) pour `/var/www/html/…` avec login mot de passe.
 
 Si ce plugin vous est utile, un don est bienvenu :
 
-**[Faire un don via PayPal](https://paypal.me/VOTRE-PSEUDO)**
+**[Faire un don via PayPal](https://www.paypal.com/donate/?hosted_button_id=4SXH4ZSMN52XE)**
 
 Un bouton **cœur** dans le dashboard WHM (à côté du thème clair/sombre) ouvre le même lien.
 
