@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.2 — 2026-06-24
+
+### Corrigé
+- Thème clair (soleil) : panneaux `pre` (logs, commandes) sur fond clair au lieu de noir en WHM
+- Pied de page avec numéro de version visible aussi en mode WHM intégré
+
 ## 2.5.1 — 2026-06-24
 
 ### Ajouté

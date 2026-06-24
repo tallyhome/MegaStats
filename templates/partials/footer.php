@@ -1,8 +1,10 @@
 <?php if (empty($whm_embedded)): ?>
 </main>
-<footer class="container-fluid border-top py-3 text-center text-secondary small">
-    MegaStats <?= ms_e($version ?? '') ?> · <?= ms_e($pagegen ?? '') ?>
+<?php endif; ?>
+<footer class="container-fluid border-top py-3 text-center text-secondary small ms-page-footer">
+    MegaStats v<?= ms_e($version ?? '') ?><?php if (!empty($pagegen)): ?> · <?= ms_e($pagegen) ?><?php endif; ?>
 </footer>
+<?php if (empty($whm_embedded)): ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <?php if (!empty($include_charts)): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
