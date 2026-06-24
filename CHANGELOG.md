@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.4 — 2026-06-24
+
+### Corrigé
+- Thème clair : alertes en carte blanche à bordure colorée (plus de fond marron `alert-warning`)
+
 ## 2.5.3 — 2026-06-24
 
 ### Corrigé

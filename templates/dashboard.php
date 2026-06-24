@@ -7,20 +7,22 @@ if (empty($whm_embedded)) {
 ?>
 
 <?php if (!empty($cleartmp_flash)): ?>
-<div class="alert alert-info py-2 mb-3" role="alert"><?= ms_e($cleartmp_flash) ?></div>
+<div class="card ms-card ms-alert-card border-info py-2 px-3 mb-3" role="status"><?= ms_e($cleartmp_flash) ?></div>
 <?php endif; ?>
 
 <?php if (!empty($active_alerts)): ?>
 <div class="row g-3 mb-3">
     <div class="col-12">
-        <div class="alert alert-warning mb-0" role="alert">
-            <div class="fw-semibold mb-2"><i class="bi bi-exclamation-triangle me-1"></i> Active alerts</div>
-            <div class="d-flex flex-wrap gap-2">
-                <?php foreach ($active_alerts as $alert): ?>
-                    <span class="badge text-bg-<?= ms_e(ms_alert_bootstrap_class($alert['status'])) ?>">
-                        <i class="bi <?= ms_e($alert['icon']) ?> me-1"></i><?= ms_e($alert['message']) ?>
-                    </span>
-                <?php endforeach; ?>
+        <div class="card ms-card ms-alert-card border-warning mb-0">
+            <div class="card-body py-3">
+                <div class="fw-semibold mb-2"><i class="bi bi-exclamation-triangle me-1 text-warning"></i> Active alerts</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <?php foreach ($active_alerts as $alert): ?>
+                        <span class="badge text-bg-<?= ms_e(ms_alert_bootstrap_class($alert['status'])) ?>">
+                            <i class="bi <?= ms_e($alert['icon']) ?> me-1"></i><?= ms_e($alert['message']) ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>

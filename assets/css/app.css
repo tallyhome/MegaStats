@@ -106,11 +106,54 @@ html[data-bs-theme="dark"] body {
 [data-bs-theme="light"] .ms-whm-wrap .ms-stat.border-warning,
 [data-bs-theme="light"] body.ms-body .ms-stat.border-warning {
     border: 2px solid var(--bs-warning) !important;
+    background-color: #ffffff !important;
 }
 
 [data-bs-theme="light"] .ms-whm-wrap .ms-stat.border-danger,
 [data-bs-theme="light"] body.ms-body .ms-stat.border-danger {
     border: 2px solid var(--bs-danger) !important;
+    background-color: #ffffff !important;
+}
+
+/* Alertes : encadré coloré, fond blanc (pas de fond marron/jaune Bootstrap) */
+[data-bs-theme="light"] .ms-alert-card,
+[data-bs-theme="light"] .ms-whm-wrap .ms-alert-card,
+[data-bs-theme="light"] body.ms-body .ms-alert-card {
+    background-color: #ffffff !important;
+    color: #212529;
+}
+
+[data-bs-theme="light"] .ms-alert-card.border-warning,
+[data-bs-theme="light"] .ms-whm-wrap .ms-alert-card.border-warning {
+    border: 2px solid var(--bs-warning) !important;
+}
+
+[data-bs-theme="light"] .ms-alert-card.border-info,
+[data-bs-theme="light"] .ms-whm-wrap .ms-alert-card.border-info {
+    border: 2px solid #0dcaf0 !important;
+}
+
+[data-bs-theme="light"] .ms-whm-wrap .alert,
+[data-bs-theme="light"] body.ms-body .alert {
+    background-color: #ffffff;
+    color: #212529;
+    border-width: 2px;
+    border-style: solid;
+}
+
+[data-bs-theme="light"] .ms-whm-wrap .alert-warning,
+[data-bs-theme="light"] body.ms-body .alert-warning {
+    border-color: var(--bs-warning);
+}
+
+[data-bs-theme="light"] .ms-whm-wrap .alert-danger,
+[data-bs-theme="light"] body.ms-body .alert-danger {
+    border-color: var(--bs-danger);
+}
+
+[data-bs-theme="light"] .ms-whm-wrap .alert-info,
+[data-bs-theme="light"] body.ms-body .alert-info {
+    border-color: #0dcaf0;
 }
 
 [data-bs-theme="light"] .ms-whm-wrap .ms-pre {
