@@ -38,10 +38,40 @@ Déconnectez-vous de WHM puis reconnectez-vous. Accès :
 
 ### Mise à jour
 
+Cas normal :
+
 ```bash
 cd /opt/megastats
+chmod +x whm/*.sh
 ./whm/update.sh
 ```
+
+`update.sh` fait `git fetch`, rebascule sur `main` si besoin (HEAD détaché après un tag), puis réinstalle dans WHM.
+
+Si le dépôt est cassé ou `/opt/megastats` absent :
+
+```bash
+cd /
+rm -rf /opt/megastats
+git clone --branch main https://github.com/tallyhome/MegaStats.git /opt/megastats
+cd /opt/megastats
+chmod +x whm/*.sh
+./whm/install.sh
+```
+
+Si `git pull` ou `checkout` échoue (modifications locales, HEAD détaché) :
+
+```bash
+cd /
+cd /opt/megastats
+git fetch origin
+git checkout -B main origin/main
+chmod +x whm/*.sh
+./whm/update.sh
+./whm/diagnose.sh
+```
+
+Vérifier la version affichée (ex. `2.5.2`). Dépannage détaillé : [whm/README.md](whm/README.md).
 
 ### Désinstallation
 
