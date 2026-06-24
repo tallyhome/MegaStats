@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.3 — 2026-06-24
+
+### Corrigé
+- Thème clair : bordures des cartes restaurées + encadrés alerte (warning/danger) sur les stats
+
 ## 2.5.2 — 2026-06-24
 
 ### Corrigé
