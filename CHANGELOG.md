@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.5.1 — 2026-06-24
+
+### Ajouté
+- `whm/disable-cpanel-analytics.sh` — supprime le bandeau « Consent and Privacy » cPanel/WebPros
+- `whm/update.sh` gère le HEAD détaché (après `git checkout` tag) et rebascule sur `main`
+
+### Modifié
+- Boutons **Don** et **thème** dans l’en-tête de la carte hostname (visibilité WHM)
+- `whm/diagnose.sh` affiche la version déployée et l’état git
+
 ## 2.5.0 — 2026-06-24
 
 ### Ajouté

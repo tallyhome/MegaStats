@@ -10,6 +10,22 @@ DYNAMICUI="/usr/local/cpanel/whostmgr/docroot/themes/x/dynamicui/dynamicui_megas
 echo "=== MegaStats WHM diagnostic ==="
 echo
 
+echo "-- Version déployée --"
+if [[ -f "$INSTALL_DIR/config/app.php" ]]; then
+    grep -E "'version'" "$INSTALL_DIR/config/app.php" 2>/dev/null || true
+else
+    echo "MANQUANT : $INSTALL_DIR/config/app.php"
+fi
+if [[ -f /opt/megastats/config/app.php ]]; then
+    echo "Source /opt/megastats :"
+    grep -E "'version'" /opt/megastats/config/app.php 2>/dev/null || true
+    if [[ -d /opt/megastats/.git ]]; then
+        echo -n "Git /opt/megastats : "
+        git -C /opt/megastats rev-parse --abbrev-ref HEAD 2>/dev/null || echo "HEAD détaché ($(git -C /opt/megastats describe --tags --always 2>/dev/null))"
+    fi
+fi
+echo
+
 echo "-- Enregistrement AppConfig --"
 if [[ -x /usr/local/cpanel/bin/is_registered_with_appconfig ]]; then
     echo -n "is_registered_with_appconfig whostmgr megastats = "

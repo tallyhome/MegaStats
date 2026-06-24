@@ -58,7 +58,8 @@ $assetsBase = ms_e($config['assets_base']);
 echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">' . "\n";
 echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">' . "\n";
 echo '<link href="' . $assetsBase . '/css/app.css" rel="stylesheet">' . "\n";
-echo '<div class="container-fluid py-3 ms-whm-wrap">' . "\n";
+echo '<script>document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("megastats-theme") === "light" ? "light" : "dark");</script>' . "\n";
+echo '<div class="container-fluid py-3 ms-whm-wrap" data-bs-theme="dark">' . "\n";
 
 ms_start_output_buffer($config);
 

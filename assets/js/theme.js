@@ -10,6 +10,9 @@
     function applyTheme(theme) {
         const resolved = theme === 'auto' ? systemTheme() : theme;
         root.setAttribute('data-bs-theme', resolved);
+        document.querySelectorAll('.ms-whm-wrap').forEach(function (el) {
+            el.setAttribute('data-bs-theme', resolved);
+        });
         if (toggle) {
             toggle.innerHTML = resolved === 'dark'
                 ? '<i class="bi bi-sun"></i>'

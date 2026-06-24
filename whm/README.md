@@ -54,4 +54,49 @@ cPanel/WHM **11.110 – 11.136+** (voir `config/distribution.php`).
 ./whm/diagnose.sh
 ```
 
+### Bandeau « Consent and Privacy » (cPanel / WebPros)
+
+Ce panneau **n’est pas MegaStats** : c’est la télémétrie **Interface Analytics** de cPanel/WHM.  
+`whmapi1 participate_in_analytics enabled=0` ne suffit pas toujours — le slideout réapparaît tant que le **compte** n’a pas enregistré un choix, ou tant que le plugin est installé.
+
+**Solution recommandée (root, une fois) :**
+
+```bash
+cd /opt/megastats
+chmod +x whm/disable-cpanel-analytics.sh
+./whm/disable-cpanel-analytics.sh
+```
+
+Ce script désactive l’analytics serveur, désinstalle le plugin `cpanel-analytics`, enregistre un refus pour root, et redémarre `cpsrvd`.  
+Après une **mise à jour cPanel**, WebPros peut le réinstaller — relancez le script.
+
+MegaStats ne collecte aucune donnée vers l’extérieur ([PRIVACY.md](../PRIVACY.md)).
+
+### `git pull` : « You are not currently on a branch »
+
+Arrive après `git checkout 2.5.0` (HEAD détaché). **Ne pas** faire `git pull` seul :
+
+```bash
+cd /opt/megastats
+./whm/update.sh
+```
+
+`update.sh` rebascule automatiquement sur `main` puis réinstalle. En dernier recours :
+
+```bash
+cd /opt/megastats
+git fetch origin
+git checkout -B main origin/main
+./whm/install.sh
+```
+
+### Boutons Don / thème absents
+
+```bash
+cd /opt/megastats && ./whm/update.sh
+./whm/diagnose.sh   # vérifier version >= 2.5.1
+```
+
+Puis **Ctrl+F5** dans WHM. Les boutons sont dans l’en-tête de la première carte (hostname).
+
 Documentation complète : [README.md](../README.md)

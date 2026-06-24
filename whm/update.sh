@@ -11,50 +11,107 @@ if [[ "$(id -u)" -ne 0 ]]; then
     exit 1
 fi
 
+read_git_branch() {
+    local dir="$1"
+    if [[ -f "$dir/config/distribution.php" ]]; then
+        grep -oP "'git_branch'\s*=>\s*'\K[^']+" "$dir/config/distribution.php" 2>/dev/null || echo "main"
+    else
+        echo "main"
+    fi
+}
+
+megastats_git_sync() {
+    local repo_dir="$1"
+    local branch="${MEGASTATS_GIT_BRANCH:-$(read_git_branch "$repo_dir")}"
+
+    echo "    fetch origin (branche : $branch)"
+    git -C "$repo_dir" fetch origin --tags --prune
+
+    if ! git -C "$repo_dir" show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+        echo "ERREUR : origin/$branch introuvable. Vérifiez le dépôt distant." >&2
+        return 1
+    fi
+
+    if ! git -C "$repo_dir" symbolic-ref -q HEAD >/dev/null 2>&1; then
+        echo "    HEAD détaché (souvent après git checkout 2.5.0) — bascule sur $branch"
+        git -C "$repo_dir" checkout -B "$branch" "origin/$branch"
+    elif [[ "$(git -C "$repo_dir" rev-parse --abbrev-ref HEAD)" != "$branch" ]]; then
+        echo "    branche $(git -C "$repo_dir" rev-parse --abbrev-ref HEAD) → $branch"
+        git -C "$repo_dir" checkout -B "$branch" "origin/$branch"
+    fi
+
+    git -C "$repo_dir" pull --ff-only origin "$branch"
+}
+
+megastats_download_release() {
+    local dest_dir="$1"
+    local release_url=""
+
+    if [[ -f "$dest_dir/config/distribution.php" ]]; then
+        release_url="$(grep -oP "'release_url'\s*=>\s*'\K[^']+" "$dest_dir/config/distribution.php" 2>/dev/null || true)"
+    fi
+    release_url="${MEGASTATS_RELEASE_URL:-$release_url}"
+
+    if [[ -z "$release_url" ]]; then
+        return 1
+    fi
+
+    local tmp
+    tmp="$(mktemp -d)"
+    echo "    Téléchargement : $release_url"
+    curl -fsSL "$release_url" -o "$tmp/archive.tar.gz"
+    tar -xzf "$tmp/archive.tar.gz" -C "$tmp"
+    local extracted
+    extracted="$(find "$tmp" -maxdepth 1 -type d -name 'MegaStats*' -o -name 'megastats*' 2>/dev/null | head -1)"
+    if [[ -z "$extracted" || ! -d "$extracted" ]]; then
+        extracted="$(find "$tmp" -maxdepth 1 -mindepth 1 -type d | head -1)"
+    fi
+    if [[ -z "$extracted" || ! -d "$extracted" ]]; then
+        echo "ERREUR : archive invalide" >&2
+        rm -rf "$tmp"
+        return 1
+    fi
+    rsync -a --delete \
+        --exclude '.git' \
+        --exclude 'storage/' \
+        "$extracted/" "$dest_dir/"
+    rm -rf "$tmp"
+    return 0
+}
+
 echo "==> MegaStats — mise à jour"
 
 UPDATED=0
+GIT_DIR=""
 
 if [[ -d "$SRC_DIR/.git" ]]; then
-    echo "    Source : git pull dans $SRC_DIR"
-    git -C "$SRC_DIR" pull --ff-only
-    UPDATED=1
+    GIT_DIR="$SRC_DIR"
 elif [[ -d "$INSTALL_DIR/.git" ]]; then
-    echo "    Install : git pull dans $INSTALL_DIR"
-    git -C "$INSTALL_DIR" pull --ff-only
+    GIT_DIR="$INSTALL_DIR"
     SRC_DIR="$INSTALL_DIR"
-    UPDATED=1
-else
-    RELEASE_URL=""
-    if [[ -f "$SRC_DIR/config/distribution.php" ]]; then
-        RELEASE_URL="$(grep -oP "'release_url'\s*=>\s*'\K[^']+" "$SRC_DIR/config/distribution.php" 2>/dev/null || true)"
-    fi
-    RELEASE_URL="${MEGASTATS_RELEASE_URL:-$RELEASE_URL}"
+fi
 
-    if [[ -n "$RELEASE_URL" ]]; then
-        TMP="$(mktemp -d)"
-        echo "    Téléchargement : $RELEASE_URL"
-        curl -fsSL "$RELEASE_URL" -o "$TMP/archive.tar.gz"
-        tar -xzf "$TMP/archive.tar.gz" -C "$TMP"
-        EXTRACTED="$(find "$TMP" -maxdepth 1 -type d -name 'megastats*' | head -1)"
-        if [[ -z "$EXTRACTED" || ! -d "$EXTRACTED" ]]; then
-            echo "ERREUR : archive invalide" >&2
-            rm -rf "$TMP"
-            exit 1
-        fi
-        rsync -a --delete \
-            --exclude '.git' \
-            --exclude 'storage/' \
-            "$EXTRACTED/" "$SRC_DIR/"
-        rm -rf "$TMP"
+if [[ -n "$GIT_DIR" ]]; then
+    echo "    Dépôt git : $GIT_DIR"
+    if megastats_git_sync "$GIT_DIR"; then
         UPDATED=1
+    else
+        echo "WARN : git sync échoué — tentative archive GitHub…"
+        if megastats_download_release "$SRC_DIR"; then
+            UPDATED=1
+        fi
     fi
+elif megastats_download_release "$SRC_DIR"; then
+    UPDATED=1
 fi
 
 if [[ "$UPDATED" -eq 0 ]]; then
-    echo "WARN : pas de dépôt git ni release_url — réinstallation des fichiers locaux uniquement."
+    echo "WARN : pas de dépôt git ni release — réinstallation des fichiers locaux uniquement."
 fi
 
 bash "$PLUGIN_DIR/install.sh"
 echo
+if [[ -f "$INSTALL_DIR/config/app.php" ]]; then
+    echo "Version installée : $(grep -oP "'version'\s*=>\s*'\K[^']+" "$INSTALL_DIR/config/app.php" 2>/dev/null || echo '?')"
+fi
 echo "Mise à jour terminée."

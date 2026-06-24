@@ -64,6 +64,27 @@ html[data-bs-theme="dark"] body {
     background: #f4f6f9;
 }
 
+.ms-host-card .ms-host-card-header {
+    background: var(--bs-card-cap-bg, var(--bs-tertiary-bg));
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ms-host-toolbar .btn {
+    min-width: 2.5rem;
+}
+
+/* WHM intégré : éviter que le thème cPanel masque les boutons outline */
+.ms-whm-wrap .ms-host-toolbar .btn {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    z-index: 2;
+}
+
+.ms-whm-wrap .ms-host-card-header {
+    flex-wrap: wrap;
+}
+
 @media (max-width: 767.98px) {
     .ms-pre-scroll {
         max-height: 240px;

@@ -31,7 +31,12 @@ fi
 
 mkdir -p "$(dirname "$TARGET_DIR")"
 if command -v git >/dev/null 2>&1; then
-    git clone --depth 1 "$GIT_REPO" "$TARGET_DIR"
+    BRANCH="main"
+    if [[ -f "$PLUGIN_DIR/../config/distribution.php" ]]; then
+        BRANCH="$(grep -oP "'git_branch'\s*=>\s*'\K[^']+" "$PLUGIN_DIR/../config/distribution.php" 2>/dev/null || echo main)"
+    fi
+    BRANCH="${MEGASTATS_GIT_BRANCH:-$BRANCH}"
+    git clone --branch "$BRANCH" --depth 1 "$GIT_REPO" "$TARGET_DIR"
 else
     echo "git absent — définissez MEGASTATS_RELEASE_URL ou installez git." >&2
     exit 1
