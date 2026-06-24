@@ -60,12 +60,6 @@ html[data-bs-theme="dark"] body {
     color-scheme: dark;
 }
 
-.ms-whm-toolbar {
-    position: sticky;
-    top: 0.5rem;
-    z-index: 20;
-}
-
 [data-bs-theme="light"] body.ms-body {
     background: #f4f6f9;
 }
