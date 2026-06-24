@@ -63,18 +63,15 @@ Voir [INSTALL.md](INSTALL.md) pour `/var/www/html/…` avec login mot de passe.
 | `config/app.php` | Version, historique, cron |
 | `config/monitoring.php` | Commandes shell, vnStat, MySQL |
 | `config/security.php` | Auth standalone |
-| `config/distribution.php` | URL Git, don, compatibilité annoncée |
-| `config/app.whm.php` | Overrides plugin WHM |
+| `config/distribution.php` | URL Git, compatibilité (usage interne) |
 
-### Don (optionnel)
+## Soutenir MegaStats
 
-Éditez `config/distribution.php` :
+Si ce plugin vous est utile, un don est bienvenu :
 
-```php
-'donate_url' => 'https://…',
-```
+**[Faire un don via PayPal](https://paypal.me/VOTRE-PSEUDO)**
 
-Un bouton **Don** apparaît dans le dashboard WHM.
+Un bouton **cœur** dans le dashboard WHM (à côté du thème clair/sombre) ouvre le même lien.
 
 ## Confidentialité
 

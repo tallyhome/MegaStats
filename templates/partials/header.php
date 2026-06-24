@@ -31,8 +31,8 @@
                 <i class="bi bi-moon-stars"></i>
             </button>
             <?php if (!empty($donate_url)): ?>
-                <a href="<?= ms_e($donate_url) ?>" class="btn btn-sm btn-outline-warning" target="_blank" rel="noopener" title="Soutenir le projet">
-                    <i class="bi bi-heart"></i>
+                <a href="<?= ms_e($donate_url) ?>" class="btn btn-sm btn-outline-warning" target="_blank" rel="noopener" title="Faire un don — PayPal">
+                    <i class="bi bi-heart me-1"></i>Don
                 </a>
             <?php endif; ?>
             <?php if (($auth_mode ?? 'password') === 'password' || ($auth_mode ?? '') === 'both'): ?>

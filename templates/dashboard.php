@@ -6,19 +6,6 @@ if (empty($whm_embedded)) {
 }
 ?>
 
-<?php if (!empty($whm_embedded)): ?>
-<div class="d-flex justify-content-end align-items-center gap-2 mb-3 ms-whm-toolbar">
-    <?php if (!empty($donate_url)): ?>
-        <a href="<?= ms_e($donate_url) ?>" class="btn btn-sm btn-outline-warning" target="_blank" rel="noopener">
-            <i class="bi bi-heart me-1"></i>Don
-        </a>
-    <?php endif; ?>
-    <button type="button" class="btn btn-sm btn-outline-secondary" id="themeToggle" title="Thème clair / sombre">
-        <i class="bi bi-moon-stars"></i>
-    </button>
-</div>
-<?php endif; ?>
-
 <?php if (!empty($cleartmp_flash)): ?>
 <div class="alert alert-info py-2 mb-3" role="alert"><?= ms_e($cleartmp_flash) ?></div>
 <?php endif; ?>
@@ -46,11 +33,25 @@ if (empty($whm_embedded)) {
             <div class="card-body">
                 <div class="row align-items-center g-3">
                     <div class="col-lg-4">
-                        <h1 class="h4 mb-1"><?= ms_e($hostname) ?></h1>
-                        <div class="text-secondary small"><?= ms_e($localtime) ?></div>
-                        <?php if (!empty($uptime)): ?>
-                            <div class="text-secondary small mt-1"><i class="bi bi-clock-history me-1"></i><?= ms_e($uptime) ?></div>
-                        <?php endif; ?>
+                        <div class="d-flex align-items-start justify-content-between gap-2">
+                            <div>
+                                <h1 class="h4 mb-1"><?= ms_e($hostname) ?></h1>
+                                <div class="text-secondary small"><?= ms_e($localtime) ?></div>
+                                <?php if (!empty($uptime)): ?>
+                                    <div class="text-secondary small mt-1"><i class="bi bi-clock-history me-1"></i><?= ms_e($uptime) ?></div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                                <?php if (!empty($donate_url)): ?>
+                                    <a href="<?= ms_e($donate_url) ?>" class="btn btn-sm btn-outline-warning" target="_blank" rel="noopener" title="Faire un don — PayPal">
+                                        <i class="bi bi-heart me-1"></i>Don
+                                    </a>
+                                <?php endif; ?>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="themeToggle" title="Thème clair / sombre">
+                                    <i class="bi bi-moon-stars"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-lg-8">
                         <div class="d-flex flex-wrap gap-2">
