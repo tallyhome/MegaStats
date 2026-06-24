@@ -21,7 +21,7 @@ Panneau de monitoring serveur (PHP 8.2+) pour **cPanel/WHM** et installation sta
 
 ```bash
 # 1) Cloner ou télécharger
-git clone https://github.com/VOTRE-ORG/megastats.git /opt/megastats
+git clone https://github.com/tallyhome/MegaStats.git /opt/megastats
 # ou : wget …/megastats-main.tar.gz && tar xzf …
 
 # 2) Installer (menu WHM inclus — une seule commande)

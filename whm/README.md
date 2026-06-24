@@ -5,7 +5,7 @@
 ## Installation (une commande)
 
 ```bash
-git clone https://github.com/VOTRE-ORG/megastats.git /opt/megastats
+git clone https://github.com/tallyhome/MegaStats.git /opt/megastats
 cd /opt/megastats
 chmod +x whm/*.sh
 ./whm/install.sh

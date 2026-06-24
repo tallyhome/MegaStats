@@ -16,7 +16,7 @@ GIT_REPO=""
 if [[ -f "$PLUGIN_DIR/../config/distribution.php" ]]; then
     GIT_REPO="$(grep -oP "'git_repo'\s*=>\s*'\K[^']+" "$PLUGIN_DIR/../config/distribution.php" 2>/dev/null || true)"
 fi
-GIT_REPO="${MEGASTATS_GIT_REPO:-${GIT_REPO:-https://github.com/VOTRE-ORG/megastats.git}}"
+GIT_REPO="${MEGASTATS_GIT_REPO:-${GIT_REPO:-https://github.com/tallyhome/MegaStats.git}}"
 
 if [[ -d "$TARGET_DIR/.git" ]]; then
     echo "Dépôt existant : $TARGET_DIR — lancement install.sh"
