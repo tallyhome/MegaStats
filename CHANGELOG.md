@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.6 — 2026-06-24
+
+### Corrigé
+- Même machine que MegaStats 1.x : le fallback `ss` ne remplace plus `netstat` quand le parseur trouve 0 (évitait ~794 vs ~303)
+- Parseur `netstat -nt` : état lu sur la dernière colonne (formats cPanel / AlmaLinux)
+
 ## 2.5.5 — 2026-06-24
 
 ### Corrigé

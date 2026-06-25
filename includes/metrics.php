@@ -100,6 +100,29 @@ function ms_count_legacy_tcp_lines(?string $netstatOutput): int
     return substr_count($netstatOutput, 'tcp');
 }
 
+/**
+ * @return array{local: string, foreign: string, state: string}|null
+ */
+function ms_parse_netstat_line_fields(string $line): ?array
+{
+    $normalized = preg_replace('/\s+/', ' ', trim($line)) ?? trim($line);
+    $parts = explode(' ', $normalized);
+    if (count($parts) < 6 || !preg_match('/^tcp/i', $parts[0])) {
+        return null;
+    }
+
+    $state = strtoupper($parts[count($parts) - 1]);
+    if ($state === 'ESTAB') {
+        $state = 'ESTABLISHED';
+    }
+
+    return [
+        'local' => $parts[count($parts) - 3],
+        'foreign' => $parts[count($parts) - 2],
+        'state' => $state,
+    ];
+}
+
 function ms_parse_netstat_connections(?string $netstatOutput = null): array
 {
     $output = $netstatOutput ?? ms_shell('netstat -nt 2>/dev/null');
@@ -114,35 +137,31 @@ function ms_parse_netstat_connections(?string $netstatOutput = null): array
                 continue;
             }
 
-            if (!preg_match('/^tcp/i', $line)) {
+            $fields = ms_parse_netstat_line_fields($line);
+            if ($fields === null) {
                 continue;
             }
 
-            $normalized = preg_replace('/\s+/', ' ', $line) ?? $line;
-            $parts = explode(' ', $normalized);
-            if (count($parts) < 6) {
-                continue;
-            }
-
-            $state = strtoupper($parts[5]);
-            if ($state !== 'ESTABLISHED') {
+            if ($fields['state'] !== 'ESTABLISHED') {
                 continue;
             }
 
             $established++;
-            if (!ms_is_inbound_connection($parts[3])) {
+            if (!ms_is_inbound_connection($fields['local'])) {
                 continue;
             }
 
             $establishedInbound++;
-            $ip = ms_extract_ip_from_address($parts[4]);
+            $ip = ms_extract_ip_from_address($fields['foreign']);
             if ($ip !== null) {
                 $byIp[$ip] = ($byIp[$ip] ?? 0) + 1;
             }
         }
     }
 
-    if ($established === 0) {
+    // ss uniquement si netstat est indisponible — pas quand le parseur trouve 0
+    // (sinon ss compte souvent plus de sockets que netstat -nt sur la même machine)
+    if ($established === 0 && trim($output) === '') {
         $ssOutput = ms_shell("ss -H -nt state established 2>/dev/null");
         foreach (explode("\n", $ssOutput) as $line) {
             $line = trim($line);
