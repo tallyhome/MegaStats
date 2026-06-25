@@ -526,7 +526,7 @@ function ms_build_dashboard(array $config): array
         ],
         ['label' => $mem1Label ?: 'Memory', 'value' => $mem1 ?: '—', 'unit' => $mem1Units, 'tip' => $mem1Tip],
         ['label' => $mem2Label ?: 'Swap', 'value' => $mem2 ?: '—', 'unit' => $mem2Units, 'tip' => $mem2Tip],
-        ['label' => 'TCP conn', 'value' => (string) ($clientStats['established_tcp'] ?? substr_count($netstat, 'tcp')), 'unit' => '', 'tip' => 'Connexions TCP établies (toutes directions)'],
+        ['label' => 'TCP conn', 'value' => (string) ($clientStats['tcp_lines'] ?? ms_count_legacy_tcp_lines($netstatRaw)), 'unit' => '', 'tip' => 'Lignes TCP dans netstat -nt (comme MegaStats 1.x — tous états)'],
         ['label' => 'Apache thds', 'value' => (string) substr_count($pstree, 'httpd'), 'unit' => '', 'tip' => 'Apache processes/threads'],
         ['label' => 'MySQL thds', 'value' => (string) substr_count($pstree, 'mysqld'), 'unit' => '', 'tip' => 'MySQL processes/threads'],
     ];

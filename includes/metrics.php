@@ -89,6 +89,17 @@ function ms_parse_shell_users(?string $top = null): int
     return count(array_filter(explode("\n", trim($who))));
 }
 
+function ms_count_legacy_tcp_lines(?string $netstatOutput): int
+{
+    if ($netstatOutput === null || trim($netstatOutput) === '') {
+        return 0;
+    }
+
+    // MegaStats 1.x : substr_count($netstat, 'tcp') sur la sortie de `netstat -nt`
+    // (toutes les lignes tcp/tcp6, tous états : ESTABLISHED, TIME_WAIT, etc.)
+    return substr_count($netstatOutput, 'tcp');
+}
+
 function ms_parse_netstat_connections(?string $netstatOutput = null): array
 {
     $output = $netstatOutput ?? ms_shell('netstat -nt 2>/dev/null');
@@ -175,6 +186,7 @@ function ms_count_connected_clients(?string $netstatOutput = null, ?string $top 
         'unique_ips' => (int) $connections['unique_ips'],
         'established_tcp' => (int) $connections['established_tcp'],
         'established_inbound' => (int) ($connections['established_inbound'] ?? 0),
+        'tcp_lines' => ms_count_legacy_tcp_lines($netstatOutput),
         'shell_users' => ms_parse_shell_users($top),
         'by_ip' => $connections['by_ip'],
     ];
@@ -191,7 +203,8 @@ function ms_format_connections_report(array $stats): string
     $text = "Clients connectés (toutes origines, tous sites/comptes)\n";
     $text .= "=======================================================\n";
     $text .= 'IP uniques distantes : ' . $stats['unique_ips'] . "\n";
-    $text .= 'Connexions TCP établies (total) : ' . $stats['established_tcp'] . "\n";
+    $text .= 'Lignes TCP (netstat -nt, comme v1) : ' . (int) ($stats['tcp_lines'] ?? 0) . "\n";
+    $text .= 'Connexions TCP établies (ESTABLISHED) : ' . $stats['established_tcp'] . "\n";
     $text .= 'Connexions entrantes (clients → serveur) : ' . ($stats['established_inbound'] ?? $stats['unique_ips']) . "\n";
     $text .= 'Sessions shell (SSH) : ' . $stats['shell_users'] . "\n\n";
     $text .= "Détail par adresse IP (connexions établies) :\n";

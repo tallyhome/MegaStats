@@ -228,7 +228,7 @@ Ce n'est **pas** la même chose que :
 | Métrique | Signification |
 |----------|----------------|
 | **Clients connectés (IP)** | Visiteurs / clients réels (IP uniques) |
-| **TCP conn** | Nombre total de sockets TCP (1 personne = plusieurs connexions) |
+| **TCP conn** | Lignes `tcp` dans `netstat -nt` (comme v1 — tous états) |
 | **Sessions shell** | Utilisateurs connectés en SSH (`who` / `w`) |
 
 Cliquez sur le chiffre pour le détail par IP (`?connections=1`).

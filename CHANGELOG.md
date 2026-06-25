@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.5 — 2026-06-24
+
+### Corrigé
+- **TCP conn** : comptage aligné sur MegaStats 1.x (`substr_count` sur `netstat -nt`) au lieu des seules connexions ESTABLISHED
+
 ## 2.5.4 — 2026-06-24
 
 ### Corrigé
