@@ -15,6 +15,7 @@ function ms_config_definitions(array $config): array
             'label' => 'Application',
             'description' => 'Rafraîchissement, historique, cron et cache shell.',
             'fields' => [
+                'name' => ['type' => 'readonly', 'label' => 'Nom'],
                 'version' => ['type' => 'readonly', 'label' => 'Version'],
                 'cron_token' => ['type' => 'string', 'label' => 'Jeton cron', 'hint' => 'Secret pour cron.php / cron-mail.php'],
             ],
@@ -33,6 +34,7 @@ function ms_config_definitions(array $config): array
             'label' => 'Sécurité',
             'description' => 'Authentification standalone (ignoré en mode WHM).',
             'fields' => [
+                'username' => ['type' => 'readonly', 'label' => 'Identifiant'],
                 'password_hash' => ['type' => 'password_hash', 'label' => 'Mot de passe', 'hint' => 'Laisser vide pour conserver le hash actuel'],
                 'new_password' => ['type' => 'new_password', 'label' => 'Nouveau mot de passe'],
                 'ip_whitelist' => ['type' => 'lines', 'label' => 'IP autorisées (vide = toutes)'],
@@ -43,11 +45,26 @@ function ms_config_definitions(array $config): array
             'label' => 'Mail & délivrabilité',
             'description' => 'Scans RBL, rapports et tests inbox.',
             'fields' => [
+                'mail_report_email' => [
+                    'type' => 'email',
+                    'label' => 'E-mail rapport quotidien',
+                    'hint' => 'Reçoit le rapport délivrabilité chaque jour (heure ci-dessous). Laissez vide pour désactiver.',
+                ],
+                'mail_alert_email' => [
+                    'type' => 'email',
+                    'label' => 'E-mail alertes RBL',
+                    'hint' => 'Alerte immédiate si une IP est listée sur une blacklist. Vide = même adresse que le rapport.',
+                ],
+                'mail_report_hour' => ['type' => 'int', 'label' => 'Heure du rapport (0–23)', 'hint' => 'Par défaut 7h (cron-mail.php)'],
+                'mail_scan_hour' => ['type' => 'int', 'label' => 'Heure du scan (0–23)', 'hint' => 'Par défaut 6h (cron-mail.php)'],
+                'mail_helo_name' => ['type' => 'string', 'label' => 'Nom HELO SMTP', 'hint' => 'Vide = hostname du serveur'],
                 'mail_domains' => ['type' => 'lines', 'label' => 'Domaines (un par ligne, vide = auto)'],
                 'mail_sending_ips' => ['type' => 'lines', 'label' => 'IP d\'envoi (vide = auto)'],
                 'mail_dkim_selectors' => ['type' => 'lines', 'label' => 'Sélecteurs DKIM'],
                 'mail_test_inboxes' => ['type' => 'map', 'label' => 'Boîtes test inbox'],
                 'mail_test_mx_hosts' => ['type' => 'map', 'label' => 'Hôtes MX de test'],
+                'update_script' => ['type' => 'readonly', 'label' => 'Script mise à jour'],
+                'update_git_repo' => ['type' => 'readonly', 'label' => 'Dépôt GitHub'],
             ],
         ],
         'alerts' => [
@@ -178,6 +195,7 @@ function ms_config_parse_value(string $type, mixed $raw, mixed $current): mixed
         'lines' => ms_config_parse_lines((string) $raw),
         'map' => is_array($raw) ? ms_config_parse_map_array($raw) : ms_config_parse_map_text((string) $raw),
         'readonly', 'password_hash' => $current,
+        'email' => trim((string) $raw),
         'new_password' => (string) $raw,
         default => trim((string) $raw),
     };

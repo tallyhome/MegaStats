@@ -51,6 +51,10 @@ $renderField = static function (array $field) use ($active_file): void {
         <?php elseif ($type === 'int' || $type === 'float'): ?>
             <input type="number" step="<?= $type === 'float' ? '0.1' : '1' ?>" class="form-control form-control-sm" id="<?= ms_e($id) ?>"
                    name="cfg[<?= ms_e($key) ?>]" value="<?= ms_e((string) $value) ?>">
+        <?php elseif ($type === 'email'): ?>
+            <input type="email" class="form-control form-control-sm" id="<?= ms_e($id) ?>"
+                   name="cfg[<?= ms_e($key) ?>]" value="<?= ms_e((string) $value) ?>" autocomplete="email"
+                   placeholder="exemple@domaine.tld">
         <?php else: ?>
             <input type="text" class="form-control form-control-sm" id="<?= ms_e($id) ?>"
                    name="cfg[<?= ms_e($key) ?>]" value="<?= ms_e((string) $value) ?>">

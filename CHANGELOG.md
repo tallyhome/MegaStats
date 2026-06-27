@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.6 — 2026-06-24
+
+### Modifié
+- Config **Application** : champ `name` en lecture seule
+- Config **Mail** : champs **e-mail rapport quotidien** et **e-mail alertes RBL** (+ heures scan/rapport, HELO)
+
 ## 3.1.5 — 2026-06-24
 
 ### Modifié
