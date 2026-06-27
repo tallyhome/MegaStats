@@ -107,6 +107,9 @@ function ms_handle_app_routes(array $config): bool
     if (ms_handle_mail_page($config)) {
         return true;
     }
+    if (ms_handle_config_page($config)) {
+        return true;
+    }
 
     return false;
 }

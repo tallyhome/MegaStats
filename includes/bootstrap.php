@@ -34,6 +34,7 @@ require MEGASTATS_ROOT . '/includes/mail/checks.php';
 require MEGASTATS_ROOT . '/includes/mail/scanner.php';
 require MEGASTATS_ROOT . '/includes/mail/report.php';
 require MEGASTATS_ROOT . '/includes/router.php';
+require MEGASTATS_ROOT . '/includes/config-editor.php';
 
 $config = array_merge(
     require MEGASTATS_ROOT . '/config/app.php',

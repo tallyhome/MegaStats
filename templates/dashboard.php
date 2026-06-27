@@ -43,6 +43,9 @@ if (empty($whm_embedded)) {
                     <?php endif; ?>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-host-toolbar">
+                    <a href="<?= ms_e(ms_url($scriptname, ['page' => 'config'])) ?>" class="btn btn-sm btn-outline-secondary" title="Modifier la configuration MegaStats">
+                        <i class="bi bi-sliders me-1"></i>Config
+                    </a>
                     <?php if (!empty($mail_enabled)): ?>
                         <a href="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="btn btn-sm btn-outline-primary" title="Module de vérification mail et délivrabilité">
                             <i class="bi bi-shield-check me-1"></i>Délivrabilité<?php if ($mail_score !== null): ?> <span class="badge text-bg-secondary ms-1"><?= (int) $mail_score ?></span><?php endif; ?>

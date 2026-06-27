@@ -45,13 +45,16 @@ if (ms_handle_mail_api($config)) {
     exit;
 }
 
+$page = (string) ms_get('page', '');
+
 if (!is_file($whmLib)) {
     ms_whm_require_access($config);
-    if ((string) ms_get('page', '') === 'mail') {
-        ms_start_output_buffer($config);
-        $view = ms_mail_build_page_view($config);
-        $view['whm_embedded'] = true;
-        ms_render_template('mail/overview', $view);
+    if ($page === 'mail') {
+        ms_render_mail_page_whm($config);
+        exit;
+    }
+    if ($page === 'config') {
+        ms_render_config_page_whm($config);
         exit;
     }
     ms_start_output_buffer($config);
@@ -67,9 +70,16 @@ require_once $whmLib;
 ms_whm_require_access($config);
 
 $assetsBase = ms_e($config['assets_base']);
-$isMailPage = (string) ms_get('page', '') === 'mail';
+$isMailPage = $page === 'mail';
+$isConfigPage = $page === 'config';
 
-WHM::header($isMailPage ? 'MegaStats — Mail' : 'MegaStats', 0, 0);
+$whmTitle = match ($page) {
+    'mail' => 'MegaStats — Délivrabilité',
+    'config' => 'MegaStats — Configuration',
+    default => 'MegaStats',
+};
+
+WHM::header($whmTitle, 0, 0);
 
 echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">' . "\n";
 echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">' . "\n";
@@ -78,6 +88,8 @@ echo '<script>document.documentElement.setAttribute("data-bs-theme", localStorag
 
 if ($isMailPage) {
     ms_render_mail_page_whm($config);
+} elseif ($isConfigPage) {
+    ms_render_config_page_whm($config);
 } else {
     echo '<div class="container-fluid py-3 ms-whm-wrap" data-bs-theme="dark">' . "\n";
     ms_start_output_buffer($config);
@@ -93,10 +105,10 @@ if ($isMailPage) {
 WHM::footer();
 
 echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>' . "\n";
-echo '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>' . "\n";
 if ($isMailPage) {
     echo '<script src="' . $assetsBase . '/js/mail.js"></script>' . "\n";
-} else {
+} elseif (!$isConfigPage) {
+    echo '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/charts.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/update.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/app.js"></script>' . "\n";

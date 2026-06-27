@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0 — 2026-06-24
+
+### Ajouté
+- **Éditeur de configuration** dans le dashboard (`?page=config`) : modification de tous les fichiers `config/*.php` (app, monitoring, sécurité, mail, alertes, distribution, WHM)
+- Bouton **Config** sur le dashboard système
+- Changement de mot de passe standalone depuis l'interface (sans éditer le hash bcrypt)
+
 ## 3.0.1 — 2026-06-24
 
 ### Ajouté
