@@ -14,6 +14,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="<?= ms_e($assets_base ?? '/assets') ?>/js/mail.js"></script>
 <?php endif; ?>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="<?= ms_e($assets_base ?? '/assets') ?>/js/update.js"></script>
 <script src="<?= ms_e($assets_base ?? '/assets') ?>/js/theme.js"></script>
 <script src="<?= ms_e($assets_base ?? '/assets') ?>/js/app.js"></script>

@@ -84,31 +84,55 @@ function ms_update_can_run(array $config): bool
     return $user === 'root' || $user === null;
 }
 
-function ms_update_flash_from_request(): string
+function ms_update_flash_payload(): ?array
 {
     $state = (string) ms_get('update', '');
-    if ($state === 'checked') {
-        return 'Vérification des mises à jour terminée.';
+    if ($state === '') {
+        return null;
     }
-    if ($state === 'ok') {
-        return 'Mise à jour installée. Rechargez la page (Ctrl+F5).';
-    }
-    if ($state === 'fail') {
-        $msg = (string) ms_get('update_msg', '');
-        if ($msg !== '') {
-            $decoded = base64_decode($msg, true);
-            if (is_string($decoded) && $decoded !== '') {
-                return 'Échec mise à jour : ' . $decoded;
-            }
+
+    return match ($state) {
+        'ok' => [
+            'type' => 'success',
+            'title' => 'Mise à jour réussie',
+            'message' => 'MegaStats a été mis à jour. Rechargez la page si la version affichée n\'a pas changé (Ctrl+F5).',
+            'autohide' => 4500,
+        ],
+        'fail' => [
+            'type' => 'error',
+            'title' => 'Échec de la mise à jour',
+            'message' => ms_update_fail_message(),
+            'autohide' => 0,
+        ],
+        'denied' => [
+            'type' => 'warning',
+            'title' => 'Accès refusé',
+            'message' => 'La mise à jour est réservée à une session WHM root.',
+            'autohide' => 5000,
+        ],
+        default => null,
+    };
+}
+
+function ms_update_fail_message(): string
+{
+    $msg = (string) ms_get('update_msg', '');
+    if ($msg !== '') {
+        $decoded = base64_decode($msg, true);
+        if (is_string($decoded) && $decoded !== '') {
+            return $decoded;
         }
-
-        return 'Échec de la mise à jour. Consultez /opt/megastats ou lancez ./whm/update.sh en SSH.';
-    }
-    if ($state === 'denied') {
-        return 'Mise à jour réservée à la session WHM root.';
     }
 
-    return '';
+    return 'Consultez /opt/megastats ou exécutez ./whm/update.sh en SSH.';
+}
+
+/** @deprecated use ms_update_flash_payload() */
+function ms_update_flash_from_request(): string
+{
+    $payload = ms_update_flash_payload();
+
+    return is_array($payload) ? (string) ($payload['message'] ?? '') : '';
 }
 
 function ms_json_exit(array $payload, int $code = 200): never
@@ -214,19 +238,19 @@ function ms_handle_update_web(array $config): bool
     $scriptname = (string) ($config['scriptname'] ?? ms_whm_request_path());
 
     if (!ms_update_can_run($config)) {
-        header('Location: ' . ms_url($scriptname, ['update' => 'denied']));
+        header('Location: ' . ms_page_url($config, ['update' => 'denied']));
         exit;
     }
 
     if ($action === 'check') {
         ms_update_status($config, true);
-        header('Location: ' . ms_url($scriptname, ['update' => 'checked']));
+        header('Location: ' . ms_page_url($config, []));
         exit;
     }
 
     if ($action === 'run') {
         if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
-            header('Location: ' . ms_url($scriptname));
+            header('Location: ' . ms_page_url($config, []));
             exit;
         }
 
@@ -235,7 +259,7 @@ function ms_handle_update_web(array $config): bool
         if (!$result['ok']) {
             $params['update_msg'] = base64_encode(mb_substr((string) ($result['output'] ?? ''), 0, 1500));
         }
-        header('Location: ' . ms_url($scriptname, $params));
+        header('Location: ' . ms_page_url($config, $params));
         exit;
     }
 

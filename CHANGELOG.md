@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.5 — 2026-06-24
+
+### Modifié
+- Plus de bandeau « Vérification terminée » après revérification (retour silencieux au dashboard)
+- Confirmation de mise à jour via **SweetAlert2** (style pro, thème sombre WHM)
+- Toasts auto-disparition pour succès ; URL nettoyée après notification
+- Suppression du bouton **MAJ** dupliqué dans la barre d'outils WHM (tout est dans le bandeau)
+
 ## 3.1.4 — 2026-06-24
 
 ### Corrigé

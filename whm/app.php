@@ -117,6 +117,8 @@ if ($isMailPage) {
     echo '<script src="' . $assetsBase . '/js/app.js"></script>' . "\n";
 }
 if (!$isConfigPage) {
+    echo '<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">' . "\n";
+    echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>' . "\n";
     echo '<script>window.MegaStatsUpdate=' . json_encode([
         'checkUrl' => ms_api_url($config, ['api' => 'update', 'action' => 'check']),
         'runUrl' => ms_api_url($config, ['api' => 'update', 'action' => 'run']),
