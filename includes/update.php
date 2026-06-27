@@ -80,7 +80,48 @@ function ms_update_can_run(array $config): bool
     }
 
     $user = ms_whm_user();
+
     return $user === 'root' || $user === null;
+}
+
+function ms_update_flash_from_request(): string
+{
+    $state = (string) ms_get('update', '');
+    if ($state === 'checked') {
+        return 'Vérification des mises à jour terminée.';
+    }
+    if ($state === 'ok') {
+        return 'Mise à jour installée. Rechargez la page (Ctrl+F5).';
+    }
+    if ($state === 'fail') {
+        $msg = (string) ms_get('update_msg', '');
+        if ($msg !== '') {
+            $decoded = base64_decode($msg, true);
+            if (is_string($decoded) && $decoded !== '') {
+                return 'Échec mise à jour : ' . $decoded;
+            }
+        }
+
+        return 'Échec de la mise à jour. Consultez /opt/megastats ou lancez ./whm/update.sh en SSH.';
+    }
+    if ($state === 'denied') {
+        return 'Mise à jour réservée à la session WHM root.';
+    }
+
+    return '';
+}
+
+function ms_json_exit(array $payload, int $code = 200): never
+{
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    http_response_code($code);
+    header('Content-Type: application/json; charset=utf-8');
+    ms_security_headers();
+    echo json_encode($payload, JSON_THROW_ON_ERROR);
+    exit;
 }
 
 function ms_update_script_path(array $config): string
@@ -124,18 +165,81 @@ function ms_update_run(array $config): array
         @chmod($script, 0755);
     }
 
+    @set_time_limit(300);
+
     $cmd = 'bash ' . escapeshellarg($script) . ' 2>&1';
     $output = [];
     $code = 0;
-    exec($cmd, $output, $code);
+
+    if (function_exists('exec') && !ms_function_disabled('exec')) {
+        exec($cmd, $output, $code);
+        $text = implode("\n", $output);
+    } else {
+        $text = (string) shell_exec($cmd);
+        $code = ($text !== '' && (str_contains($text, 'Mise à jour terminée') || str_contains($text, 'Version installée'))) ? 0 : 1;
+    }
 
     ms_log($config, 'activity', 'Update run exit=' . $code);
 
     return [
         'ok' => $code === 0,
-        'output' => implode("\n", $output),
+        'output' => $text,
         'exit_code' => $code,
     ];
+}
+
+function ms_function_disabled(string $name): bool
+{
+    $disabled = ini_get('disable_functions');
+    if (!is_string($disabled) || $disabled === '') {
+        return false;
+    }
+
+    return in_array($name, array_map('trim', explode(',', $disabled)), true);
+}
+
+function ms_handle_update_web(array $config): bool
+{
+    if (!(defined('MEGASTATS_WHM') && MEGASTATS_WHM)) {
+        return false;
+    }
+
+    $action = (string) (ms_post('update_action', '') ?: ms_get('update_action', ''));
+    if ($action === '') {
+        return false;
+    }
+
+    ms_whm_require_access($config);
+
+    $scriptname = (string) ($config['scriptname'] ?? ms_whm_request_path());
+
+    if (!ms_update_can_run($config)) {
+        header('Location: ' . ms_url($scriptname, ['update' => 'denied']));
+        exit;
+    }
+
+    if ($action === 'check') {
+        ms_update_status($config, true);
+        header('Location: ' . ms_url($scriptname, ['update' => 'checked']));
+        exit;
+    }
+
+    if ($action === 'run') {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            header('Location: ' . ms_url($scriptname));
+            exit;
+        }
+
+        $result = ms_update_run($config);
+        $params = ['update' => $result['ok'] ? 'ok' : 'fail'];
+        if (!$result['ok']) {
+            $params['update_msg'] = base64_encode(mb_substr((string) ($result['output'] ?? ''), 0, 1500));
+        }
+        header('Location: ' . ms_url($scriptname, $params));
+        exit;
+    }
+
+    return false;
 }
 
 function ms_handle_update_api(array $config): bool
@@ -144,36 +248,29 @@ function ms_handle_update_api(array $config): bool
         return false;
     }
 
-    header('Content-Type: application/json; charset=utf-8');
-    ms_security_headers();
+    if (defined('MEGASTATS_WHM') && MEGASTATS_WHM) {
+        ms_whm_require_access($config);
+    }
 
     $action = (string) ms_get('action', 'check');
 
     if ($action === 'check') {
-        echo json_encode(ms_update_status($config, (bool) ms_get('refresh')), JSON_THROW_ON_ERROR);
-        return true;
+        ms_json_exit(ms_update_status($config, (bool) ms_get('refresh')));
     }
 
     if ($action === 'run') {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['ok' => false, 'error' => 'POST required'], JSON_THROW_ON_ERROR);
-            return true;
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            ms_json_exit(['ok' => false, 'error' => 'POST required'], 405);
         }
 
         if (!empty($config['csrf_enabled']) && !ms_verify_csrf($config)) {
-            http_response_code(403);
-            echo json_encode(['ok' => false, 'error' => 'CSRF'], JSON_THROW_ON_ERROR);
-            return true;
+            ms_json_exit(['ok' => false, 'error' => 'CSRF'], 403);
         }
 
         $result = ms_update_run($config);
         $result['status'] = ms_update_status($config, true);
-        echo json_encode($result, JSON_THROW_ON_ERROR);
-        return true;
+        ms_json_exit($result, $result['ok'] ? 200 : 500);
     }
 
-    http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Unknown action'], JSON_THROW_ON_ERROR);
-    return true;
+    ms_json_exit(['ok' => false, 'error' => 'Unknown action'], 400);
 }

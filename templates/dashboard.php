@@ -52,6 +52,21 @@ if (empty($whm_embedded)) {
                         </a>
                     <?php endif; ?>
                     <span class="badge text-bg-secondary">v<?= ms_e($version ?? '') ?></span>
+                    <?php if (!empty($update_can_run) && !empty($whm_embedded)): ?>
+                        <a href="<?= ms_e($update_web_check_url ?? ms_url($scriptname, ['update_action' => 'check'])) ?>"
+                           class="btn btn-sm btn-outline-secondary" title="Vérifier les mises à jour MegaStats">
+                            <i class="bi bi-cloud-arrow-down me-1"></i>MAJ
+                        </a>
+                        <?php if (!empty($update_available)): ?>
+                        <form method="post" action="<?= ms_e($scriptname) ?>" class="d-inline"
+                              onsubmit="return confirm('Installer v<?= ms_e($update_latest ?? '') ?> ?');">
+                            <input type="hidden" name="update_action" value="run">
+                            <button type="submit" class="btn btn-sm btn-info" title="Installer la mise à jour">
+                                <i class="bi bi-cloud-download me-1"></i>Installer v<?= ms_e($update_latest ?? '') ?>
+                            </button>
+                        </form>
+                        <?php endif; ?>
+                    <?php else: ?>
                     <button type="button" class="btn btn-sm btn-outline-secondary ms-update-check"
                             data-api-url="<?= ms_e($update_api_url ?? ms_url($scriptname, ['api' => 'update', 'action' => 'check'])) ?>"
                             title="Vérifier les mises à jour MegaStats">
@@ -63,6 +78,7 @@ if (empty($whm_embedded)) {
                                 title="Installer la mise à jour">
                             <i class="bi bi-cloud-download me-1"></i>Installer<?php if (!empty($update_latest)): ?> v<?= ms_e($update_latest) ?><?php endif; ?>
                         </button>
+                    <?php endif; ?>
                     <?php endif; ?>
                     <?php if (!empty($donate_url)): ?>
                         <a href="<?= ms_e($donate_url) ?>" class="btn btn-sm btn-warning" target="_blank" rel="noopener" title="Faire un don — PayPal">

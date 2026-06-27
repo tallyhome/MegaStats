@@ -687,5 +687,7 @@ function ms_build_dashboard(array $config): array
         'update_latest' => (string) ($updateStatus['latest'] ?? ''),
         'update_can_run' => ms_update_can_run($config),
         'update_api_url' => ms_api_url($config, ['api' => 'update', 'action' => 'check']),
+        'update_web_check_url' => ms_url($scriptname, ['update_action' => 'check']),
+        'update_flash' => ms_update_flash_from_request(),
     ];
 }

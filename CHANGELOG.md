@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.3 — 2026-06-24
+
+### Corrigé
+- Boutons MAJ WHM : **formulaires HTML** (sans JavaScript) pour Vérifier / Mettre à jour
+- API JSON update : nettoyage du buffer PHP + auth WHM
+- URLs API injectées via `window.MegaStatsUpdate` (session cpsess)
+
 ## 3.1.2 — 2026-06-24
 
 ### Modifié

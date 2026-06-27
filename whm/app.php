@@ -29,6 +29,10 @@ if (isset($_GET['whmtest']) && (string) $_GET['whmtest'] === '1') {
 
 require __DIR__ . '/includes/bootstrap.php';
 
+if (ms_handle_update_web($config)) {
+    exit;
+}
+
 if (ms_handle_metrics_api($config)) {
     exit;
 }
@@ -110,7 +114,13 @@ if ($isMailPage) {
 } elseif (!$isConfigPage) {
     echo '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/charts.js"></script>' . "\n";
-    echo '<script src="' . $assetsBase . '/js/update.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/app.js"></script>' . "\n";
+}
+if (!$isConfigPage) {
+    echo '<script>window.MegaStatsUpdate=' . json_encode([
+        'checkUrl' => ms_api_url($config, ['api' => 'update', 'action' => 'check']),
+        'runUrl' => ms_api_url($config, ['api' => 'update', 'action' => 'run']),
+    ], JSON_THROW_ON_ERROR) . ';</script>' . "\n";
+    echo '<script src="' . $assetsBase . '/js/update.js"></script>' . "\n";
 }
 echo '<script src="' . $assetsBase . '/js/theme.js"></script>' . "\n";

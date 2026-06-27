@@ -4,20 +4,26 @@
     var checkButtons = document.querySelectorAll('.ms-update-check');
     var runButtons = document.querySelectorAll('.ms-update-run');
 
-    var fallbackApiUrl = null;
-    if (banner) {
+    var cfg = window.MegaStatsUpdate || {};
+    var fallbackApiUrl = cfg.checkUrl || null;
+
+    if (!fallbackApiUrl && banner) {
         fallbackApiUrl = banner.getAttribute('data-api-url');
     }
     if (!fallbackApiUrl && checkButtons.length) {
         fallbackApiUrl = checkButtons[0].getAttribute('data-api-url');
     }
-    if (!fallbackApiUrl && runButtons.length) {
-        fallbackApiUrl = runButtons[0].getAttribute('data-api-url');
-    }
 
     var csrf = banner ? (banner.getAttribute('data-csrf') || '') : '';
 
     function buildApiUrl(action) {
+        if (action === 'check' && cfg.checkUrl) {
+            return cfg.checkUrl;
+        }
+        if (action === 'run' && cfg.runUrl) {
+            return cfg.runUrl;
+        }
+
         var pathname = window.location.pathname || '';
         if (pathname.indexOf('megastats') !== -1) {
             return pathname + '?api=update&action=' + action;
@@ -29,7 +35,7 @@
     }
 
     var apiCheckUrl = buildApiUrl('check');
-    if (!apiCheckUrl) {
+    if (!apiCheckUrl || checkButtons.length === 0) {
         return;
     }
 
@@ -44,11 +50,7 @@
             return;
         }
         banner.classList.remove('alert-info', 'alert-secondary', 'alert-success');
-        if (available) {
-            banner.classList.add('alert-info');
-        } else {
-            banner.classList.add('alert-secondary');
-        }
+        banner.classList.add(available ? 'alert-info' : 'alert-secondary');
     }
 
     function renderStatus(data) {
@@ -68,9 +70,6 @@
         }
 
         setBannerStyle(true);
-        if (banner) {
-            banner.classList.remove('d-none');
-        }
         setStatus('Version <strong>' + (data.latest || '?') + '</strong> disponible (actuelle : v' + current + ').');
         runButtons.forEach(function (btn) {
             btn.classList.remove('d-none');
@@ -78,7 +77,7 @@
     }
 
     function fetchStatus(refresh) {
-        var url = apiCheckUrl + (refresh ? '&refresh=1' : '');
+        var url = apiCheckUrl + (refresh ? (apiCheckUrl.indexOf('?') >= 0 ? '&' : '?') + 'refresh=1' : '');
         checkButtons.forEach(function (btn) {
             btn.disabled = true;
         });
@@ -97,7 +96,7 @@
             })
             .catch(function (err) {
                 if (statusEl) {
-                    setStatus('<span class="text-warning">Impossible de vérifier les mises à jour (' + (err.message || 'réseau') + ').</span>');
+                    setStatus('<span class="text-warning">AJAX indisponible (' + (err.message || 'réseau') + '). Utilisez le lien Vérifier MAJ.</span>');
                 }
                 checkButtons.forEach(function (btn) {
                     btn.disabled = false;
@@ -106,6 +105,11 @@
     }
 
     function runUpdate(btn) {
+        var runUrl = buildApiUrl('run');
+        if (!runUrl) {
+            return;
+        }
+
         if (btn) {
             btn.disabled = true;
         }
@@ -116,7 +120,7 @@
             body.append('csrf_token', csrf);
         }
 
-        fetch(buildApiUrl('run'), {
+        fetch(runUrl, {
             method: 'POST',
             body: body,
             credentials: 'same-origin',
@@ -144,7 +148,7 @@
                 }
             })
             .catch(function (err) {
-                setStatus('<span class="text-danger">Erreur : ' + (err.message || 'réseau') + '</span>');
+                setStatus('<span class="text-danger">AJAX échoué (' + (err.message || 'réseau') + '). Utilisez le bouton Mettre à jour du bandeau.</span>');
                 if (btn) {
                     btn.disabled = false;
                 }

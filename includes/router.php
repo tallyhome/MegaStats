@@ -98,6 +98,9 @@ function ms_render_mail_page_whm(array $config): void
 
 function ms_handle_app_routes(array $config): bool
 {
+    if (ms_handle_update_web($config)) {
+        return true;
+    }
     if (ms_handle_update_api($config)) {
         return true;
     }
