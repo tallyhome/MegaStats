@@ -12,6 +12,7 @@ if (empty($whm_embedded)) {
 $listedCount = (int) ($rbl['listed_count'] ?? 0);
 $totalZones = (int) ($rbl['total_zones'] ?? count($rbl['all'] ?? []));
 $refreshUrl = ms_url($scriptname, ['page' => 'mail', 'ip' => $selected_ip, 'refresh' => '1']);
+$primary_ip = $scan['ip'] ?? null;
 ?>
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
@@ -21,7 +22,7 @@ $refreshUrl = ms_url($scriptname, ['page' => 'mail', 'ip' => $selected_ip, 'refr
     </div>
     <div class="d-flex flex-wrap gap-2">
         <a href="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i>Délivrabilité
+            <i class="bi bi-arrow-left me-1"></i>Email &amp; IP
         </a>
         <a href="<?= ms_e($dashboard_url ?? $scriptname) ?>" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-speedometer2 me-1"></i>Dashboard
@@ -30,6 +31,10 @@ $refreshUrl = ms_url($scriptname, ['page' => 'mail', 'ip' => $selected_ip, 'refr
         <a href="<?= ms_e($refreshUrl) ?>" class="btn btn-sm btn-primary"><i class="bi bi-arrow-repeat me-1"></i>Revérifier maintenant</a>
     </div>
 </div>
+
+<?php if (!empty($all_ips)): ?>
+<?php require MEGASTATS_ROOT . '/templates/mail/partials/ip-list.php'; ?>
+<?php endif; ?>
 
 <?php if ($listedCount > 0): ?>
 <div class="alert alert-danger py-2 mb-3" role="alert">
@@ -89,28 +94,6 @@ $refreshUrl = ms_url($scriptname, ['page' => 'mail', 'ip' => $selected_ip, 'refr
         </div>
     </div>
 </div>
-
-<?php if (!empty($all_ips) && count($all_ips) > 1): ?>
-<div class="card ms-card">
-    <div class="card-header fw-semibold">Autres IP du serveur</div>
-    <div class="card-body d-flex flex-wrap gap-2">
-        <?php foreach ($all_ips as $ipAddr): ?>
-            <?php if ($ipAddr === $selected_ip) {
-                continue;
-            } ?>
-            <a href="<?= ms_e(ms_url($scriptname, ['page' => 'mail', 'ip' => $ipAddr])) ?>" class="btn btn-sm btn-outline-secondary">
-                <?= ms_e($ipAddr) ?>
-                <?php
-                $n = $ip_summaries[$ipAddr]['listed'] ?? null;
-                if ($n !== null && $n > 0):
-                ?>
-                    <span class="badge text-bg-danger ms-1"><?= (int) $n ?></span>
-                <?php endif; ?>
-            </a>
-        <?php endforeach; ?>
-    </div>
-</div>
-<?php endif; ?>
 
 <?php
 if (empty($whm_embedded)) {

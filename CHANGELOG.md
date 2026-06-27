@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.2 — 2026-06-24
+
+### Modifié
+- Bouton dashboard : **Délivrabilité Email & IP**
+- Page détail blacklist : liste de **toutes les IP en haut** (IP actuelle surlignée)
+
 ## 3.1.1 — 2026-06-24
 
 ### Corrigé
