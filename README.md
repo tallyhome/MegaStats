@@ -3,6 +3,7 @@
 Panneau de monitoring serveur (PHP 8.2+) pour **cPanel/WHM** et installation standalone.
 
 - CPU, RAM, load, disques, réseau (vnStat), MySQL, connexions clients
+- **Mail & délivrabilité** : SPF, DKIM, DMARC, RBL, SMTP, SpamAssassin, rapports (v3)
 - Historique graphique (1 jour, 1 semaine, 1 mois, période personnalisée)
 - Thème clair / sombre (icône lune / soleil)
 - **Plugin WHM** : auth native, menu Plugins + sidebar, données dans `/var/cpanel/megastats/`

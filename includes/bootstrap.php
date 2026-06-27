@@ -28,11 +28,18 @@ require MEGASTATS_ROOT . '/includes/metrics.php';
 require MEGASTATS_ROOT . '/includes/monitoring.php';
 require MEGASTATS_ROOT . '/includes/requests.php';
 require MEGASTATS_ROOT . '/includes/maintenance.php';
+require MEGASTATS_ROOT . '/includes/update.php';
+require MEGASTATS_ROOT . '/includes/mail/storage.php';
+require MEGASTATS_ROOT . '/includes/mail/checks.php';
+require MEGASTATS_ROOT . '/includes/mail/scanner.php';
+require MEGASTATS_ROOT . '/includes/mail/report.php';
+require MEGASTATS_ROOT . '/includes/router.php';
 
 $config = array_merge(
     require MEGASTATS_ROOT . '/config/app.php',
     require MEGASTATS_ROOT . '/config/monitoring.php',
     require MEGASTATS_ROOT . '/config/security.php',
+    require MEGASTATS_ROOT . '/config/mail.php',
     ['alerts' => require MEGASTATS_ROOT . '/config/alerts.php']
 );
 
@@ -48,6 +55,9 @@ date_default_timezone_set($config['timezone'] ?? 'UTC');
 
 ms_ensure_log_dir($config['log_path']);
 ms_ensure_log_dir($config['history_path'] ?? MEGASTATS_ROOT . '/storage/metrics');
+if (!empty($config['mail_enabled'])) {
+    ms_mail_ensure_storage($config);
+}
 
 ob_start();
 $toppass = system("grep password /root/.my.cnf|cut -d '\"' -f2");

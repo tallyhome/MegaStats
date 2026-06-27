@@ -13,6 +13,7 @@ return [
     'scriptname' => '/cgi/megastats/index.cgi',
     'assets_base' => '/cgi/megastats/assets',
     'public_entry' => '/cgi/megastats/index.cgi',
+    'mail_path' => '/var/cpanel/megastats/mail',
     'refresh' => 0,
     'cron_collect_on_dashboard' => true,
     'shell_cache_enabled' => true,

@@ -643,6 +643,9 @@ function ms_build_dashboard(array $config): array
 
     ms_log($config, 'activity', 'Dashboard viewed');
 
+    $updateStatus = ms_update_status($config);
+    $mailLatest = !empty($config['mail_enabled']) ? ms_mail_load_latest($config) : null;
+
     return [
         'hostname' => $hostname,
         'localtime' => $config['localtime'],
@@ -677,5 +680,12 @@ function ms_build_dashboard(array $config): array
         'history_writable' => (bool) ($metricsMeta['writable'] ?? $charts['writable'] ?? false),
         'history_write_report' => ms_history_writability_report($config),
         'cron_enabled' => !empty($config['cron_enabled']),
+        'mail_enabled' => !empty($config['mail_enabled']),
+        'mail_url' => ms_url($scriptname, ['page' => 'mail']),
+        'mail_score' => $mailLatest['score'] ?? null,
+        'update_available' => !empty($updateStatus['update_available']),
+        'update_latest' => (string) ($updateStatus['latest'] ?? ''),
+        'update_can_run' => ms_update_can_run($config),
+        'update_api_url' => ms_url($scriptname, ['api' => 'update', 'action' => 'check']),
     ];
 }

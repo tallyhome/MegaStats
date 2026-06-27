@@ -37,8 +37,23 @@ if (ms_handle_request($config)) {
     exit;
 }
 
+if (ms_handle_update_api($config)) {
+    exit;
+}
+
+if (ms_handle_mail_api($config)) {
+    exit;
+}
+
 if (!is_file($whmLib)) {
     ms_whm_require_access($config);
+    if ((string) ms_get('page', '') === 'mail') {
+        ms_start_output_buffer($config);
+        $view = ms_mail_build_page_view($config);
+        $view['whm_embedded'] = true;
+        ms_render_template('mail/overview', $view);
+        exit;
+    }
     ms_start_output_buffer($config);
     $view = ms_build_dashboard($config);
     $view['auth_mode'] = 'whm';
@@ -51,32 +66,39 @@ require_once $whmLib;
 
 ms_whm_require_access($config);
 
-WHM::header('MegaStats', 0, 0);
-
 $assetsBase = ms_e($config['assets_base']);
+$isMailPage = (string) ms_get('page', '') === 'mail';
+
+WHM::header($isMailPage ? 'MegaStats — Mail' : 'MegaStats', 0, 0);
 
 echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">' . "\n";
 echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">' . "\n";
 echo '<link href="' . $assetsBase . '/css/app.css" rel="stylesheet">' . "\n";
 echo '<script>document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("megastats-theme") === "light" ? "light" : "dark");</script>' . "\n";
-echo '<div class="container-fluid py-3 ms-whm-wrap" data-bs-theme="dark">' . "\n";
 
-ms_start_output_buffer($config);
-
-$view = ms_build_dashboard($config);
-$view['auth_mode'] = 'whm';
-$view['deployment'] = 'whm';
-$view['whm_embedded'] = true;
-$view['user'] = ms_whm_user() ?? 'root';
-
-ms_render_template('dashboard', $view);
-
-echo "</div>\n";
+if ($isMailPage) {
+    ms_render_mail_page_whm($config);
+} else {
+    echo '<div class="container-fluid py-3 ms-whm-wrap" data-bs-theme="dark">' . "\n";
+    ms_start_output_buffer($config);
+    $view = ms_build_dashboard($config);
+    $view['auth_mode'] = 'whm';
+    $view['deployment'] = 'whm';
+    $view['whm_embedded'] = true;
+    $view['user'] = ms_whm_user() ?? 'root';
+    ms_render_template('dashboard', $view);
+    echo "</div>\n";
+}
 
 WHM::footer();
 
 echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>' . "\n";
 echo '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>' . "\n";
-echo '<script src="' . $assetsBase . '/js/charts.js"></script>' . "\n";
+if ($isMailPage) {
+    echo '<script src="' . $assetsBase . '/js/mail.js"></script>' . "\n";
+} else {
+    echo '<script src="' . $assetsBase . '/js/charts.js"></script>' . "\n";
+    echo '<script src="' . $assetsBase . '/js/update.js"></script>' . "\n";
+    echo '<script src="' . $assetsBase . '/js/app.js"></script>' . "\n";
+}
 echo '<script src="' . $assetsBase . '/js/theme.js"></script>' . "\n";
-echo '<script src="' . $assetsBase . '/js/app.js"></script>' . "\n";

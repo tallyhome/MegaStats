@@ -1,61 +1,24 @@
 # Changelog
 
+## 3.0.0 — 2026-06-24
+
+### Ajouté
+- **Module Mail & délivrabilité** : page dédiée (SPF, DKIM, DMARC, PTR, TLS, banner, HELO, 30 RBL, SpamAssassin, tests MX, score, graphiques, alertes RBL, rapport e-mail)
+- Bouton **Mail** sur le dashboard système
+- **Vérification de mise à jour** GitHub + bouton **Mettre à jour** (WHM root, via `/opt/megastats/whm/update.sh`)
+- `cron-mail.php` : scan planifié + rapport quotidien
+- `config/mail.php` : configuration du module
+
 ## 2.5.6 — 2026-06-24
 
 ### Corrigé
-- Même machine que MegaStats 1.x : le fallback `ss` ne remplace plus `netstat` quand le parseur trouve 0 (évitait ~794 vs ~303)
-- Parseur `netstat -nt` : état lu sur la dernière colonne (formats cPanel / AlmaLinux)
+- TCP conn : alignement MegaStats 1.x + correction fallback `ss` sur même machine
 
 ## 2.5.5 — 2026-06-24
 
 ### Corrigé
-- **TCP conn** : comptage aligné sur MegaStats 1.x (`substr_count` sur `netstat -nt`) au lieu des seules connexions ESTABLISHED
+- Comptage TCP conn aligné sur `netstat -nt` (legacy)
 
-## 2.5.4 — 2026-06-24
+## Versions antérieures
 
-### Corrigé
-- Thème clair : alertes en carte blanche à bordure colorée (plus de fond marron `alert-warning`)
-
-## 2.5.3 — 2026-06-24
-
-### Corrigé
-- Thème clair : bordures des cartes restaurées + encadrés alerte (warning/danger) sur les stats
-
-## 2.5.2 — 2026-06-24
-
-### Corrigé
-- Thème clair (soleil) : panneaux `pre` (logs, commandes) sur fond clair au lieu de noir en WHM
-- Pied de page avec numéro de version visible aussi en mode WHM intégré
-
-## 2.5.1 — 2026-06-24
-
-### Ajouté
-- `whm/disable-cpanel-analytics.sh` — supprime le bandeau « Consent and Privacy » cPanel/WebPros
-- `whm/update.sh` gère le HEAD détaché (après `git checkout` tag) et rebascule sur `main`
-
-### Modifié
-- Boutons **Don** et **thème** dans l’en-tête de la carte hostname (visibilité WHM)
-- `whm/diagnose.sh` affiche la version déployée et l’état git
-
-## 2.5.0 — 2026-06-24
-
-### Ajouté
-- Distribution Git : `whm/install.sh`, `whm/update.sh`, docs LICENSE / PRIVACY
-- Historique graphiques : 1 jour, 1 semaine, 1 mois, période personnalisée
-- Bouton thème clair/sombre (lune/soleil) en mode WHM intégré
-- Bouton **Vider /tmp** (fichiers > 1 h, hors `sess_*` et répertoires système)
-- Entrée sidebar WHM via `dynamicui` + menu Plugins via `addon_megastats.cgi`
-- Rétention historique jusqu’à 30 jours (cron chaque minute)
-
-### Modifié
-- Load average et disk usage affichés **au-dessus** du trafic réseau
-- `install.sh` configure le menu WHM automatiquement (plus besoin de `fix-menu.sh`)
-- Version 2.5.0
-
-### Compatibilité
-- cPanel/WHM 11.110 – 11.136+
-
-## 2.4.0
-
-- Plugin WHM stable (auth cpsess, F5, dashboard PHP-CGI)
-- Métriques JSON, alertes, Bootstrap 5
+Voir les tags GitHub `2.5.0` – `2.5.4`.

@@ -10,6 +10,10 @@ if (ms_handle_metrics_api($config)) {
     exit;
 }
 
+if (ms_handle_app_routes($config)) {
+    exit;
+}
+
 if (ms_handle_request($config)) {
     exit;
 }

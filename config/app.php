@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'name' => 'MegaStats',
-    'version' => '2.5.6',
+    'version' => '3.0.0',
     'timezone' => 'UTC',
     'gzip' => 0,
     'refresh' => 1,

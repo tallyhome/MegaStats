@@ -6,6 +6,8 @@ if (empty($whm_embedded)) {
 }
 ?>
 
+<?php require MEGASTATS_ROOT . '/templates/partials/update-banner.php'; ?>
+
 <?php if (!empty($cleartmp_flash)): ?>
 <div class="card ms-card ms-alert-card border-info py-2 px-3 mb-3" role="status"><?= ms_e($cleartmp_flash) ?></div>
 <?php endif; ?>
@@ -41,6 +43,16 @@ if (empty($whm_embedded)) {
                     <?php endif; ?>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-host-toolbar">
+                    <?php if (!empty($mail_enabled)): ?>
+                        <a href="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="btn btn-sm btn-primary" title="Mail & délivrabilité">
+                            <i class="bi bi-envelope-check me-1"></i>Mail<?php if ($mail_score !== null): ?> <span class="badge text-bg-light text-dark ms-1"><?= (int) $mail_score ?></span><?php endif; ?>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (!empty($update_available)): ?>
+                        <button type="button" class="btn btn-sm btn-info" id="msUpdateRun" data-api-url="<?= ms_e($update_api_url ?? '') ?>" title="Mise à jour v<?= ms_e($update_latest ?? '') ?>">
+                            <i class="bi bi-cloud-download me-1"></i>MàJ
+                        </button>
+                    <?php endif; ?>
                     <?php if (!empty($donate_url)): ?>
                         <a href="<?= ms_e($donate_url) ?>" class="btn btn-sm btn-warning" target="_blank" rel="noopener" title="Faire un don — PayPal">
                             <i class="bi bi-heart-fill me-1"></i>Don

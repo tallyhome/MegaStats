@@ -10,6 +10,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="<?= ms_e($assets_base ?? '/assets') ?>/js/charts.js"></script>
 <?php endif; ?>
+<?php if (!empty($include_mail_js)): ?>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="<?= ms_e($assets_base ?? '/assets') ?>/js/mail.js"></script>
+<?php endif; ?>
+<script src="<?= ms_e($assets_base ?? '/assets') ?>/js/update.js"></script>
 <script src="<?= ms_e($assets_base ?? '/assets') ?>/js/theme.js"></script>
 <script src="<?= ms_e($assets_base ?? '/assets') ?>/js/app.js"></script>
 </body>

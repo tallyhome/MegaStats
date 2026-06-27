@@ -40,11 +40,11 @@ if [[ -z "$PHP_CGI" ]]; then
     exit 1
 fi
 
-mkdir -p "$DATA_DIR"/{logs,metrics,cache}
+mkdir -p "$DATA_DIR"/{logs,metrics,cache,mail/history}
 WEBGROUP="nobody"
 if getent group "$WEBGROUP" >/dev/null 2>&1; then
     chown -R root:"$WEBGROUP" "$DATA_DIR"
-    chmod 775 "$DATA_DIR" "$DATA_DIR/logs" "$DATA_DIR/metrics" "$DATA_DIR/cache"
+    chmod 775 "$DATA_DIR" "$DATA_DIR/logs" "$DATA_DIR/metrics" "$DATA_DIR/cache" "$DATA_DIR/mail" "$DATA_DIR/mail/history"
 fi
 
 mkdir -p "$INSTALL_DIR"
@@ -83,6 +83,7 @@ bash "$PLUGIN_DIR/rebuild-menu.sh"
 
 cat > "$CRON_FILE" <<EOF
 * * * * * root $PHP_BIN $INSTALL_DIR/cron.php >/dev/null 2>&1
+0 * * * * root $PHP_BIN $INSTALL_DIR/cron-mail.php >/dev/null 2>&1
 EOF
 chmod 644 "$CRON_FILE"
 
