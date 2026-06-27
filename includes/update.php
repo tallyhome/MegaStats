@@ -85,17 +85,23 @@ function ms_update_can_run(array $config): bool
 
 function ms_update_script_path(array $config): string
 {
-    $configured = (string) ($config['update_script'] ?? '/opt/megastats/whm/update.sh');
-    if (is_file($configured) && is_executable($configured)) {
-        return $configured;
+    $candidates = array_values(array_filter([
+        (string) ($config['update_script'] ?? ''),
+        '/opt/megastats/whm/update.sh',
+        MEGASTATS_ROOT . '/whm/update.sh',
+    ]));
+
+    foreach ($candidates as $path) {
+        if (is_file($path)) {
+            if (!is_executable($path)) {
+                @chmod($path, 0755);
+            }
+
+            return $path;
+        }
     }
 
-    $fallback = MEGASTATS_ROOT . '/../whm/update.sh';
-    if (is_file($fallback) && is_executable($fallback)) {
-        return $fallback;
-    }
-
-    return $configured;
+    return '/opt/megastats/whm/update.sh';
 }
 
 function ms_update_run(array $config): array
@@ -108,8 +114,14 @@ function ms_update_run(array $config): array
     if (!is_file($script)) {
         return [
             'ok' => false,
-            'output' => 'Script introuvable : ' . $script . "\nInstallez le dépôt dans /opt/megastats.",
+            'output' => 'Script introuvable : ' . $script . "\n"
+                . "Réinstallez : git clone https://github.com/tallyhome/MegaStats.git /opt/megastats\n"
+                . 'puis : chmod +x whm/*.sh && ./whm/update.sh',
         ];
+    }
+
+    if (!is_executable($script)) {
+        @chmod($script, 0755);
     }
 
     $cmd = 'bash ' . escapeshellarg($script) . ' 2>&1';

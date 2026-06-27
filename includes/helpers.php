@@ -49,6 +49,25 @@ function ms_url(string $scriptname, array $params = []): string
     return $scriptname . '?' . http_build_query($params);
 }
 
+/**
+ * URL API fiable en WHM (préserve cpsess depuis la requête courante).
+ */
+function ms_api_url(array $config, array $params): string
+{
+    $scriptname = (string) ($config['scriptname'] ?? ms_script_name());
+
+    if (function_exists('ms_is_whm_deployment') && ms_is_whm_deployment($config)) {
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        if (is_string($uri) && preg_match('#(/cpsess\d+/[^?]*megastats[^?]*)#', $uri, $m)) {
+            $scriptname = $m[1];
+        } elseif (function_exists('ms_whm_request_path')) {
+            $scriptname = ms_whm_request_path();
+        }
+    }
+
+    return ms_url($scriptname, $params);
+}
+
 function ms_popup_js(string $url, string $name, string $features): string
 {
     $safeUrl = ms_e($url);

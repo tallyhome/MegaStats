@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.1 — 2026-06-24
+
+### Corrigé
+- Boutons **Vérifier MAJ** / **Mettre à jour** WHM : URL API avec session `cpsess` (comme les graphiques)
+- `update.sh` : `git reset --hard origin/main` + `git clean -fd` si le dépôt `/opt/megastats` a des fichiers modifiés ou non suivis
+- `update.sh` / `install.sh` : `chmod +x whm/*.sh` automatique
+- Chemin script de mise à jour : fallback `/opt/megastats/whm/update.sh` même sans bit exécutable
+
 ## 3.1.0 — 2026-06-24
 
 ### Ajouté

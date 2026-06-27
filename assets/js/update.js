@@ -4,20 +4,32 @@
     var checkButtons = document.querySelectorAll('.ms-update-check');
     var runButtons = document.querySelectorAll('.ms-update-run');
 
-    var apiUrl = null;
+    var fallbackApiUrl = null;
     if (banner) {
-        apiUrl = banner.getAttribute('data-api-url');
+        fallbackApiUrl = banner.getAttribute('data-api-url');
     }
-    if (!apiUrl && checkButtons.length) {
-        apiUrl = checkButtons[0].getAttribute('data-api-url');
+    if (!fallbackApiUrl && checkButtons.length) {
+        fallbackApiUrl = checkButtons[0].getAttribute('data-api-url');
     }
-    if (!apiUrl && runButtons.length) {
-        apiUrl = runButtons[0].getAttribute('data-api-url');
+    if (!fallbackApiUrl && runButtons.length) {
+        fallbackApiUrl = runButtons[0].getAttribute('data-api-url');
     }
 
     var csrf = banner ? (banner.getAttribute('data-csrf') || '') : '';
 
-    if (!apiUrl) {
+    function buildApiUrl(action) {
+        var pathname = window.location.pathname || '';
+        if (pathname.indexOf('megastats') !== -1) {
+            return pathname + '?api=update&action=' + action;
+        }
+        if (fallbackApiUrl) {
+            return fallbackApiUrl.replace(/action=[^&]+/, 'action=' + action);
+        }
+        return null;
+    }
+
+    var apiCheckUrl = buildApiUrl('check');
+    if (!apiCheckUrl) {
         return;
     }
 
@@ -66,21 +78,26 @@
     }
 
     function fetchStatus(refresh) {
-        var url = apiUrl + (refresh ? '&refresh=1' : '');
+        var url = apiCheckUrl + (refresh ? '&refresh=1' : '');
         checkButtons.forEach(function (btn) {
             btn.disabled = true;
         });
-        fetch(url, { credentials: 'same-origin' })
-            .then(function (r) { return r.json(); })
+        fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+            .then(function (r) {
+                if (!r.ok) {
+                    throw new Error('HTTP ' + r.status);
+                }
+                return r.json();
+            })
             .then(function (data) {
                 renderStatus(data);
                 checkButtons.forEach(function (btn) {
                     btn.disabled = false;
                 });
             })
-            .catch(function () {
+            .catch(function (err) {
                 if (statusEl) {
-                    setStatus('<span class="text-warning">Impossible de vérifier les mises à jour.</span>');
+                    setStatus('<span class="text-warning">Impossible de vérifier les mises à jour (' + (err.message || 'réseau') + ').</span>');
                 }
                 checkButtons.forEach(function (btn) {
                     btn.disabled = false;
@@ -99,12 +116,20 @@
             body.append('csrf_token', csrf);
         }
 
-        fetch(apiUrl.replace('action=check', 'action=run'), {
+        fetch(buildApiUrl('run'), {
             method: 'POST',
             body: body,
-            credentials: 'same-origin'
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' }
         })
-            .then(function (r) { return r.json(); })
+            .then(function (r) {
+                return r.json().then(function (data) {
+                    if (!r.ok && !data.output) {
+                        throw new Error('HTTP ' + r.status);
+                    }
+                    return data;
+                });
+            })
             .then(function (res) {
                 if (res.ok) {
                     setStatus('<span class="text-success">Mise à jour terminée. Rechargez la page (Ctrl+F5).</span>');
@@ -118,8 +143,8 @@
                     btn.disabled = false;
                 }
             })
-            .catch(function () {
-                setStatus('<span class="text-danger">Erreur réseau.</span>');
+            .catch(function (err) {
+                setStatus('<span class="text-danger">Erreur : ' + (err.message || 'réseau') + '</span>');
                 if (btn) {
                     btn.disabled = false;
                 }

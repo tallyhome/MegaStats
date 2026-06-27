@@ -60,14 +60,15 @@ chmod +x whm/*.sh
 ./whm/install.sh
 ```
 
-Si `git pull` ou `checkout` échoue (modifications locales, HEAD détaché) :
+Si `git pull` ou `checkout` échoue (modifications locales, HEAD détaché, fichiers untracked) :
 
 ```bash
-cd /
 cd /opt/megastats
-git fetch origin
-git checkout -B main origin/main
 chmod +x whm/*.sh
+git fetch origin
+git checkout -B main origin/main -f
+git reset --hard origin/main
+git clean -fd
 ./whm/update.sh
 ./whm/diagnose.sh
 ```

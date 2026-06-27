@@ -6,6 +6,8 @@ PLUGIN_DIR="$(cd "$(dirname "$0")" && pwd)"
 SRC_DIR="$(cd "$PLUGIN_DIR/.." && pwd)"
 INSTALL_DIR="/usr/local/cpanel/whostmgr/docroot/cgi/megastats"
 
+chmod +x "$PLUGIN_DIR"/*.sh 2>/dev/null || true
+
 if [[ "$(id -u)" -ne 0 ]]; then
     echo "Erreur : exécutez en root." >&2
     exit 1
@@ -32,15 +34,12 @@ megastats_git_sync() {
         return 1
     fi
 
-    if ! git -C "$repo_dir" symbolic-ref -q HEAD >/dev/null 2>&1; then
-        echo "    HEAD détaché (souvent après git checkout 2.5.0) — bascule sur $branch"
-        git -C "$repo_dir" checkout -B "$branch" "origin/$branch"
-    elif [[ "$(git -C "$repo_dir" rev-parse --abbrev-ref HEAD)" != "$branch" ]]; then
-        echo "    branche $(git -C "$repo_dir" rev-parse --abbrev-ref HEAD) → $branch"
-        git -C "$repo_dir" checkout -B "$branch" "origin/$branch"
-    fi
+    echo "    reset sur origin/$branch (ignore les modifications locales)"
+    git -C "$repo_dir" checkout -B "$branch" "origin/$branch" -f
+    git -C "$repo_dir" reset --hard "origin/$branch"
+    git -C "$repo_dir" clean -fd
 
-    git -C "$repo_dir" pull --ff-only origin "$branch"
+    return 0
 }
 
 megastats_download_release() {

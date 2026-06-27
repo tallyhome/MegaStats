@@ -665,7 +665,7 @@ function ms_build_dashboard(array $config): array
         'active_alerts' => $activeAlerts,
         'vnstat_summary' => $vnstatPanel['summary'] ?? [],
         'charts_json' => json_encode($charts, JSON_THROW_ON_ERROR),
-        'metrics_api_url' => ms_url($scriptname, ['api' => 'metrics']),
+        'metrics_api_url' => ms_api_url($config, ['api' => 'metrics']),
         'chart_range' => $chartRange,
         'chart_from' => $chartFrom,
         'chart_to' => $chartTo,
@@ -686,6 +686,6 @@ function ms_build_dashboard(array $config): array
         'update_available' => !empty($updateStatus['update_available']),
         'update_latest' => (string) ($updateStatus['latest'] ?? ''),
         'update_can_run' => ms_update_can_run($config),
-        'update_api_url' => ms_url($scriptname, ['api' => 'update', 'action' => 'check']),
+        'update_api_url' => ms_api_url($config, ['api' => 'update', 'action' => 'check']),
     ];
 }

@@ -72,6 +72,28 @@ Après une **mise à jour cPanel**, WebPros peut le réinstaller — relancez le
 
 MegaStats ne collecte aucune donnée vers l’extérieur ([PRIVACY.md](../PRIVACY.md)).
 
+### `git checkout` : fichiers modifiés / untracked
+
+Arrive si des fichiers ont été copiés à la main dans `/opt/megastats` (sans git propre). **Solution (root) :**
+
+```bash
+cd /opt/megastats
+chmod +x whm/*.sh
+git fetch origin
+git checkout -B main origin/main -f
+git reset --hard origin/main
+git clean -fd
+./whm/update.sh
+```
+
+`update.sh` (v3.1.1+) fait ce reset automatiquement.
+
+### Boutons « Vérifier MAJ » / « Mettre à jour » inactifs
+
+1. Mettre à jour d’abord en SSH (commandes ci-dessus) — la v3.1.1 corrige l’URL API WHM (`cpsess`).
+2. Rechargez WHM avec **Ctrl+F5**.
+3. Si échec : `./whm/diagnose.sh` puis vérifiez que `/opt/megastats/whm/update.sh` existe et est exécutable (`chmod +x whm/*.sh`).
+
 ### `git pull` : « You are not currently on a branch »
 
 Arrive après `git checkout 2.5.0` (HEAD détaché). **Ne pas** faire `git pull` seul :
