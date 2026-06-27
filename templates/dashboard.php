@@ -44,13 +44,21 @@ if (empty($whm_embedded)) {
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-host-toolbar">
                     <?php if (!empty($mail_enabled)): ?>
-                        <a href="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="btn btn-sm btn-primary" title="Mail & délivrabilité">
-                            <i class="bi bi-envelope-check me-1"></i>Mail<?php if ($mail_score !== null): ?> <span class="badge text-bg-light text-dark ms-1"><?= (int) $mail_score ?></span><?php endif; ?>
+                        <a href="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="btn btn-sm btn-outline-primary" title="Module de vérification mail et délivrabilité">
+                            <i class="bi bi-shield-check me-1"></i>Délivrabilité<?php if ($mail_score !== null): ?> <span class="badge text-bg-secondary ms-1"><?= (int) $mail_score ?></span><?php endif; ?>
                         </a>
                     <?php endif; ?>
-                    <?php if (!empty($update_available)): ?>
-                        <button type="button" class="btn btn-sm btn-info" id="msUpdateRun" data-api-url="<?= ms_e($update_api_url ?? '') ?>" title="Mise à jour v<?= ms_e($update_latest ?? '') ?>">
-                            <i class="bi bi-cloud-download me-1"></i>MàJ
+                    <span class="badge text-bg-secondary">v<?= ms_e($version ?? '') ?></span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary ms-update-check"
+                            data-api-url="<?= ms_e($update_api_url ?? ms_url($scriptname, ['api' => 'update', 'action' => 'check'])) ?>"
+                            title="Vérifier les mises à jour MegaStats">
+                        <i class="bi bi-cloud-arrow-down me-1"></i>MAJ
+                    </button>
+                    <?php if (!empty($update_can_run)): ?>
+                        <button type="button" class="btn btn-sm btn-info ms-update-run<?= empty($update_available) ? ' d-none' : '' ?>"
+                                data-api-url="<?= ms_e($update_api_url ?? '') ?>"
+                                title="Installer la mise à jour">
+                            <i class="bi bi-cloud-download me-1"></i>Installer<?php if (!empty($update_latest)): ?> v<?= ms_e($update_latest) ?><?php endif; ?>
                         </button>
                     <?php endif; ?>
                     <?php if (!empty($donate_url)): ?>

@@ -58,6 +58,11 @@ function ms_mail_run_scan(array $config): array
     $rbl = ms_mail_check_rbl($ip);
     $rblListed = $rbl['listed'];
 
+    $ipsRbl = [];
+    foreach ($ips as $scanIp) {
+        $ipsRbl[$scanIp] = ms_mail_check_rbl($scanIp);
+    }
+
     $smtpHost = (string) ($config['mail_smtp_host'] ?? '127.0.0.1');
     $smtpPort = (int) ($config['mail_smtp_port'] ?? 25);
     $smtp = ms_mail_smtp_probe($smtpHost, $smtpPort, $helo);
@@ -89,7 +94,8 @@ function ms_mail_run_scan(array $config): array
         'dns_ok' => $dnsOk,
         'smtp' => $smtp,
         'rbl' => $rbl,
-        'rbl_listed' => count($rblListed),
+        'ips_rbl' => $ipsRbl,
+        'rbl_listed' => (int) ($ipsRbl[$ip]['listed_count'] ?? count($rblListed)),
         'rbl_featured' => array_slice($rbl['all'], 0, 5),
         'spamassassin' => $spamassassin,
         'microsoft' => ms_mail_check_microsoft_snds($config, $ip),

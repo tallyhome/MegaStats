@@ -59,7 +59,7 @@ function ms_handle_mail_page(array $config): bool
         default => '',
     };
 
-    ms_render_template('mail/overview', $view);
+    ms_render_template($view['mail_template'] ?? 'mail/overview', $view);
     return true;
 }
 
@@ -92,7 +92,7 @@ function ms_render_mail_page_whm(array $config): void
     echo '<link href="' . $assetsBase . '/css/app.css" rel="stylesheet">' . "\n";
     echo '<script>document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("megastats-theme") === "light" ? "light" : "dark");</script>' . "\n";
     echo '<div class="container-fluid py-3 ms-whm-wrap" data-bs-theme="dark">' . "\n";
-    ms_render_template('mail/overview', $view);
+    ms_render_template($view['mail_template'] ?? 'mail/overview', $view);
     echo "</div>\n";
 }
 

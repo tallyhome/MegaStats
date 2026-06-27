@@ -9,7 +9,9 @@ function ms_mail_rbl_zones(): array
         'bl.spamcop.net' => 'Spamcop',
         'b.barracudacentral.org' => 'Barracuda',
         'dnsbl.sorbs.net' => 'SORBS',
-        'dnsbl-1.uceprotect.net' => 'UCEProtect',
+        'dnsbl-1.uceprotect.net' => 'UCEProtect L1',
+        'dnsbl-2.uceprotect.net' => 'UCEProtect L2',
+        'dnsbl-3.uceprotect.net' => 'UCEProtect L3',
         'psbl.surriel.com' => 'PSBL',
         'bl.mailspike.net' => 'Mailspike',
         'combined.rbl.msrbl.net' => 'MSRBL',
@@ -35,35 +37,84 @@ function ms_mail_rbl_zones(): array
         'access.redhawk.org' => 'Redhawk',
         'dnsbl.inps.de' => 'INPS',
         'bl.blocklist.de' => 'Blocklist.de',
+        'dnsbl.abuse.ch' => 'Abuse.ch',
+        'spamrbl.imp.ch' => 'IMP SPAM',
+        '0spam.fusionzero.com' => 'FusionZero',
+        'bl.nordspam.com' => 'NordSpam',
+        'singular.ttk.pte.ltd' => 'Singular',
+        'backscatter.spameatingmonkey.net' => 'SEM Backscatter',
+        'bl.spamstinks.com' => 'SpamStinks',
+        'dnsbl.cyberlogic.net' => 'Cyberlogic',
+        'dnsbl.kempt.net' => 'Kempt',
+        'dnsbl.tornevall.org' => 'Tornevall',
+        'dnsbl-0.uceprotect.net' => 'UCEProtect L0',
+        'cbl.abuseat.org' => 'CBL Abuseat',
+        'pbl.spamhaus.org' => 'Spamhaus PBL',
+        'sbl.spamhaus.org' => 'Spamhaus SBL',
+        'xbl.spamhaus.org' => 'Spamhaus XBL',
     ];
 }
 
-function ms_mail_status(bool $ok, ?string $detail = null): array
+/**
+ * @return list<string>
+ */
+function ms_mail_detect_all_ips(array $config): array
 {
-    return ['ok' => $ok, 'detail' => $detail ?? ''];
+    $found = [];
+
+    $add = static function (string $ip) use (&$found): void {
+        $ip = trim($ip);
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return;
+        }
+        if (str_starts_with($ip, '127.') || str_starts_with($ip, '169.254.')) {
+            return;
+        }
+        $found[$ip] = true;
+    };
+
+    $configured = $config['mail_sending_ips'] ?? [];
+    if (is_array($configured) && $configured !== []) {
+        foreach ($configured as $ip) {
+            if (is_string($ip)) {
+                $add($ip);
+            }
+        }
+        if ($found !== []) {
+            return array_values(array_keys($found));
+        }
+    }
+
+    $hostnameIps = ms_shell('hostname -I 2>/dev/null');
+    foreach (preg_split('/\s+/', $hostnameIps) ?: [] as $ip) {
+        $add($ip);
+    }
+
+    if (is_file('/etc/ips')) {
+        $lines = file('/etc/ips', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+        foreach ($lines as $line) {
+            $add(preg_replace('/\s.*$/', '', trim($line)) ?? '');
+        }
+    }
+
+    if (is_file('/var/cpanel/mainip')) {
+        $add(trim((string) file_get_contents('/var/cpanel/mainip')));
+    }
+
+    $ipAddr = ms_shell("ip -4 -o addr show scope global 2>/dev/null | awk '{print \$4}' | cut -d/ -f1");
+    foreach (explode("\n", $ipAddr) as $ip) {
+        $add($ip);
+    }
+
+    $keys = array_keys($found);
+    sort($keys, SORT_NATURAL);
+
+    return $keys;
 }
 
 function ms_mail_detect_ips(array $config): array
 {
-    $configured = $config['mail_sending_ips'] ?? [];
-    if (is_array($configured) && $configured !== []) {
-        return array_values(array_filter(array_map('trim', $configured)));
-    }
-
-    $out = ms_shell("hostname -I 2>/dev/null | awk '{print $1}'");
-    if ($out !== '' && filter_var($out, FILTER_VALIDATE_IP)) {
-        return [$out];
-    }
-
-    $host = ms_shell('hostname -f 2>/dev/null') ?: ms_shell('hostname 2>/dev/null');
-    if ($host !== '') {
-        $ip = gethostbyname($host);
-        if ($ip !== $host && filter_var($ip, FILTER_VALIDATE_IP)) {
-            return [$ip];
-        }
-    }
-
-    return [];
+    return ms_mail_detect_all_ips($config);
 }
 
 function ms_mail_detect_domains(array $config): array
@@ -158,25 +209,42 @@ function ms_mail_check_ptr(string $ip, string $expectedHost): array
     return ms_mail_status($ok, $ptr . ($ok ? '' : ' (attendu ~ ' . $expectedHost . ')'));
 }
 
+function ms_mail_status(bool $ok, ?string $detail = null): array
+{
+    return ['ok' => $ok, 'detail' => $detail ?? ''];
+}
+
 function ms_mail_check_rbl(string $ip): array
 {
     if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        return ['listed' => [], 'clean' => [], 'all' => []];
+        return [
+            'listed' => [],
+            'clean' => [],
+            'all' => [],
+            'listed_count' => 0,
+            'total_zones' => 0,
+            'duration_ms' => 0,
+        ];
     }
 
     $rev = implode('.', array_reverse(explode('.', $ip)));
     $listed = [];
     $clean = [];
+    $started = microtime(true);
 
     foreach (ms_mail_rbl_zones() as $zone => $label) {
-        $query = $rev . '.' . $zone . '.';
-        $listedOnZone = false;
+        $query = $rev . '.' . $zone;
+        $t0 = microtime(true);
+        $listedOnZone = @checkdnsrr($query, 'A') || @checkdnsrr($query, 'AAAA');
+        $ms = (int) round((microtime(true) - $t0) * 1000);
 
-        if (@checkdnsrr($query, 'A') || @checkdnsrr($query, 'AAAA')) {
-            $listedOnZone = true;
-        }
-
-        $entry = ['zone' => $zone, 'label' => $label, 'listed' => $listedOnZone];
+        $entry = [
+            'zone' => $zone,
+            'label' => $label,
+            'listed' => $listedOnZone,
+            'response_ms' => $ms,
+            'reason' => $listedOnZone ? ('Listed on ' . $label) : 'OK',
+        ];
         if ($listedOnZone) {
             $listed[] = $entry;
         } else {
@@ -184,11 +252,39 @@ function ms_mail_check_rbl(string $ip): array
         }
     }
 
+    $all = array_merge($listed, $clean);
+
     return [
         'listed' => $listed,
         'clean' => $clean,
-        'all' => array_merge($listed, $clean),
+        'all' => $all,
+        'listed_count' => count($listed),
+        'total_zones' => count($all),
+        'duration_ms' => (int) round((microtime(true) - $started) * 1000),
     ];
+}
+
+function ms_mail_get_rbl_for_ip(array $config, string $ip, bool $forceLive = false): array
+{
+    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        return ms_mail_check_rbl($ip);
+    }
+
+    if (!$forceLive) {
+        $scan = ms_mail_load_latest($config);
+        $cached = $scan['ips_rbl'][$ip] ?? null;
+        if (is_array($cached) && ($cached['all'] ?? []) !== []) {
+            $cached['from_cache'] = true;
+            $cached['scan_ts'] = (int) ($scan['ts'] ?? 0);
+            return $cached;
+        }
+    }
+
+    $live = ms_mail_check_rbl($ip);
+    $live['from_cache'] = false;
+    $live['scan_ts'] = time();
+
+    return $live;
 }
 
 function ms_mail_smtp_probe(string $host, int $port, string $helo): array

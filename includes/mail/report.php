@@ -88,14 +88,52 @@ function ms_mail_build_page_view(array $config): array
     $history = ms_mail_load_history($config);
     $scriptname = $config['scriptname'];
 
+    $allIps = ms_mail_detect_all_ips($config);
+    if ($scan !== null && !empty($scan['ips'])) {
+        $allIps = array_values(array_unique(array_merge($allIps, $scan['ips'])));
+    }
+    sort($allIps, SORT_NATURAL);
+
+    $ipSummaries = [];
+    foreach ($allIps as $ipAddr) {
+        $listedCount = null;
+        if ($scan !== null) {
+            $listedCount = $scan['ips_rbl'][$ipAddr]['listed_count'] ?? null;
+            if ($listedCount === null && ($scan['ip'] ?? '') === $ipAddr) {
+                $listedCount = (int) ($scan['rbl_listed'] ?? 0);
+            }
+        }
+        $ipSummaries[$ipAddr] = [
+            'listed' => $listedCount,
+            'url' => ms_url($scriptname, ['page' => 'mail', 'ip' => $ipAddr]),
+        ];
+    }
+
+    $selectedIp = trim((string) ms_get('ip', ''));
+    $mailTemplate = 'mail/overview';
+    $pageTitle = 'Mail & délivrabilité · MegaStats';
+    $rbl = null;
+
+    if ($selectedIp !== '' && filter_var($selectedIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        $forceLive = (string) ms_get('refresh', '') === '1';
+        $rbl = ms_mail_get_rbl_for_ip($config, $selectedIp, $forceLive);
+        $mailTemplate = 'mail/rbl';
+        $pageTitle = 'Blacklist · ' . $selectedIp . ' · MegaStats';
+    }
+
     return [
-        'page_title' => 'Mail & délivrabilité · MegaStats',
+        'page_title' => $pageTitle,
+        'mail_template' => $mailTemplate,
         'scan' => $scan,
         'history' => $history,
         'history_json' => json_encode($history, JSON_THROW_ON_ERROR),
         'scriptname' => $scriptname,
         'dashboard_url' => ms_url($scriptname),
         'mail_url' => ms_url($scriptname, ['page' => 'mail']),
+        'selected_ip' => $selectedIp !== '' ? $selectedIp : null,
+        'rbl' => $rbl,
+        'all_ips' => $allIps,
+        'ip_summaries' => $ipSummaries,
         'assets_base' => $config['assets_base'],
         'version' => $config['version'],
         'pagegen' => '',

@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.1 — 2026-06-24
+
+### Ajouté
+- **Liste de toutes les IP** du serveur sur le module délivrabilité (cPanel `/etc/ips`, interfaces réseau)
+- **Page détail RBL par IP** : tableau complet type MXToolbox (statut LISTED/OK, temps de réponse, ~50 listes dont UCEProtect L1/L2/L3)
+- Bouton **MAJ** toujours visible (bandeau + barre d'outils), même quand MegaStats est à jour
+
+### Modifié
+- Bouton dashboard renommé **Délivrabilité** (icône bouclier) au lieu de « Mail »
+- Scan planifié : vérification RBL pour **chaque IP** du serveur
+
 ## 3.0.0 — 2026-06-24
 
 ### Ajouté

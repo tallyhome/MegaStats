@@ -22,7 +22,7 @@ $statusIcon = static function (?bool $ok): string {
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h1 class="h4 mb-1"><i class="bi bi-envelope-check me-2"></i>Mail & délivrabilité</h1>
+        <h1 class="h4 mb-1"><i class="bi bi-shield-check me-2"></i>Mail & délivrabilité</h1>
         <div class="text-secondary small">Surveillance DNS, RBL, SMTP et réputation</div>
     </div>
     <div class="d-flex flex-wrap gap-2">
@@ -55,6 +55,33 @@ $statusIcon = static function (?bool $ok): string {
     </div>
 </div>
 <?php else: ?>
+
+<?php if (!empty($all_ips)): ?>
+<div class="card ms-card mb-3">
+    <div class="card-header fw-semibold"><i class="bi bi-hdd-network me-1"></i>Adresses IP du serveur</div>
+    <div class="card-body">
+        <p class="text-secondary small mb-3">Cliquez sur une IP pour voir le détail complet des listes noires (DNSBL).</p>
+        <div class="d-flex flex-wrap gap-2">
+            <?php foreach ($all_ips as $ipAddr):
+                $summary = $ip_summaries[$ipAddr] ?? [];
+                $listed = $summary['listed'] ?? null;
+                $isPrimary = ($scan['ip'] ?? '') === $ipAddr;
+            ?>
+            <a href="<?= ms_e($summary['url'] ?? ms_url($scriptname, ['page' => 'mail', 'ip' => $ipAddr])) ?>"
+               class="btn btn-sm <?= $isPrimary ? 'btn-outline-primary' : 'btn-outline-secondary' ?>">
+                <?= ms_e($ipAddr) ?>
+                <?php if ($isPrimary): ?><span class="badge text-bg-primary ms-1">principale</span><?php endif; ?>
+                <?php if ($listed !== null && $listed > 0): ?>
+                    <span class="badge text-bg-danger ms-1"><?= (int) $listed ?> RBL</span>
+                <?php elseif ($listed === 0): ?>
+                    <span class="badge text-bg-success ms-1">OK</span>
+                <?php endif; ?>
+            </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="row g-3 mb-3">
     <div class="col-md-4">
@@ -99,7 +126,12 @@ $statusIcon = static function (?bool $ok): string {
 
     <div class="col-lg-6">
         <div class="card ms-card h-100">
-            <div class="card-header fw-semibold">RBL <span class="badge text-bg-secondary ms-1"><?= (int) ($scan['rbl_listed'] ?? 0) ?> listée(s)</span></div>
+            <div class="card-header fw-semibold">RBL (IP principale)
+                <span class="badge text-bg-secondary ms-1"><?= (int) ($scan['rbl_listed'] ?? 0) ?> listée(s)</span>
+                <?php if (!empty($scan['ip'])): ?>
+                <a href="<?= ms_e(ms_url($scriptname, ['page' => 'mail', 'ip' => $scan['ip']])) ?>" class="btn btn-sm btn-link py-0">Voir tout</a>
+                <?php endif; ?>
+            </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0 ms-mail-checklist">
                     <?php foreach ($scan['rbl_featured'] ?? [] as $item): ?>
