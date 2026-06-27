@@ -43,7 +43,7 @@ if (empty($whm_embedded)) {
                     <?php endif; ?>
                 </div>
                 <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-host-toolbar">
-                    <a href="<?= ms_e(ms_url($scriptname, ['page' => 'config'])) ?>" class="btn btn-sm btn-outline-secondary" title="Modifier la configuration MegaStats">
+                    <a href="<?= ms_e($config_url ?? ms_url($scriptname, ['page' => 'config'])) ?>" class="btn btn-sm btn-outline-secondary" title="Modifier la configuration MegaStats">
                         <i class="bi bi-sliders me-1"></i>Config
                     </a>
                     <?php if (!empty($mail_enabled)): ?>

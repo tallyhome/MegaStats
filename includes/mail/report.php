@@ -105,7 +105,7 @@ function ms_mail_build_page_view(array $config): array
         }
         $ipSummaries[$ipAddr] = [
             'listed' => $listedCount,
-            'url' => ms_url($scriptname, ['page' => 'mail', 'ip' => $ipAddr]),
+            'url' => ms_page_url($config, ['page' => 'mail', 'ip' => $ipAddr]),
         ];
     }
 
@@ -128,8 +128,8 @@ function ms_mail_build_page_view(array $config): array
         'history' => $history,
         'history_json' => json_encode($history, JSON_THROW_ON_ERROR),
         'scriptname' => $scriptname,
-        'dashboard_url' => ms_url($scriptname),
-        'mail_url' => ms_url($scriptname, ['page' => 'mail']),
+        'dashboard_url' => ms_page_url($config, []),
+        'mail_url' => ms_page_url($config, ['page' => 'mail']),
         'selected_ip' => $selectedIp !== '' ? $selectedIp : null,
         'rbl' => $rbl,
         'all_ips' => $allIps,

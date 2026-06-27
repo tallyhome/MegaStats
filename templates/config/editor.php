@@ -62,13 +62,24 @@ $renderField = static function (array $field) use ($active_file): void {
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
+        <nav aria-label="breadcrumb" class="mb-2">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a href="<?= ms_e($dashboard_url ?? $scriptname) ?>">MegaStats</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Configuration</li>
+            </ol>
+        </nav>
         <h1 class="h4 mb-1"><i class="bi bi-sliders me-2"></i>Configuration</h1>
         <div class="text-secondary small">Modifier les fichiers <code>config/*.php</code> depuis le dashboard</div>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <a href="<?= ms_e($dashboard_url ?? $scriptname) ?>" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+        <a href="<?= ms_e($dashboard_url ?? $scriptname) ?>" class="btn btn-sm btn-primary">
+            <i class="bi bi-speedometer2 me-1"></i>Dashboard MegaStats
         </a>
+        <?php if (!empty($mail_url)): ?>
+        <a href="<?= ms_e($mail_url) ?>" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-shield-check me-1"></i>Email &amp; IP
+        </a>
+        <?php endif; ?>
         <button type="button" class="btn btn-sm btn-secondary" id="themeToggle" title="Thème"><i class="bi bi-moon-stars"></i></button>
     </div>
 </div>
@@ -90,12 +101,17 @@ $renderField = static function (array $field) use ($active_file): void {
             <div class="card-header fw-semibold">Fichiers</div>
             <div class="list-group list-group-flush">
                 <?php foreach ($definitions as $fileId => $def): ?>
-                    <a href="<?= ms_e(ms_url($scriptname, ['page' => 'config', 'file' => $fileId])) ?>"
+                    <a href="<?= ms_e($ms_link(['page' => 'config', 'file' => $fileId])) ?>"
                        class="list-group-item list-group-item-action<?= $fileId === $active_file ? ' active' : '' ?>">
                         <?= ms_e($def['label'] ?? $fileId) ?>
                         <div class="small opacity-75"><?= ms_e($def['file'] ?? '') ?></div>
                     </a>
                 <?php endforeach; ?>
+            </div>
+            <div class="card-footer p-2">
+                <a href="<?= ms_e($dashboard_url ?? $scriptname) ?>" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="bi bi-arrow-left me-1"></i>Dashboard MegaStats
+                </a>
             </div>
         </div>
     </div>
@@ -112,7 +128,7 @@ $renderField = static function (array $field) use ($active_file): void {
                     <p class="text-secondary small"><?= ms_e($activeDef['description']) ?></p>
                 <?php endif; ?>
 
-                <form method="post" action="<?= ms_e(ms_url($scriptname, ['page' => 'config', 'file' => $active_file])) ?>">
+                <form method="post" action="<?= ms_e($ms_link(['page' => 'config', 'file' => $active_file])) ?>">
                     <?= $csrf_field ?? '' ?>
                     <input type="hidden" name="config_action" value="save">
                     <input type="hidden" name="file" value="<?= ms_e($active_file) ?>">
@@ -125,7 +141,7 @@ $renderField = static function (array $field) use ($active_file): void {
                         <button type="submit" class="btn btn-primary btn-sm"<?= empty($config_writable) ? ' disabled' : '' ?>>
                             <i class="bi bi-check2 me-1"></i>Enregistrer
                         </button>
-                        <a href="<?= ms_e(ms_url($scriptname, ['page' => 'config', 'file' => $active_file])) ?>" class="btn btn-outline-secondary btn-sm">Annuler</a>
+                        <a href="<?= ms_e($ms_link(['page' => 'config', 'file' => $active_file])) ?>" class="btn btn-outline-secondary btn-sm">Annuler</a>
                     </div>
                 </form>
             </div>

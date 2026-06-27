@@ -68,6 +68,14 @@ function ms_api_url(array $config, array $params): string
     return ms_url($scriptname, $params);
 }
 
+/**
+ * URL de page MegaStats (WHM : conserve cpsess).
+ */
+function ms_page_url(array $config, array $params = []): string
+{
+    return ms_api_url($config, $params);
+}
+
 function ms_popup_js(string $url, string $name, string $features): string
 {
     $safeUrl = ms_e($url);

@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1.4 — 2026-06-24
+
+### Corrigé
+- Page **Configuration** : bouton **Dashboard MegaStats** visible + fil d'Ariane ; lien sidebar ; URLs WHM avec `cpsess`
+
 ## 3.1.3 — 2026-06-24
 
 ### Corrigé

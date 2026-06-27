@@ -681,13 +681,14 @@ function ms_build_dashboard(array $config): array
         'history_write_report' => ms_history_writability_report($config),
         'cron_enabled' => !empty($config['cron_enabled']),
         'mail_enabled' => !empty($config['mail_enabled']),
-        'mail_url' => ms_url($scriptname, ['page' => 'mail']),
+        'mail_url' => ms_page_url($config, ['page' => 'mail']),
+        'config_url' => ms_page_url($config, ['page' => 'config']),
         'mail_score' => $mailLatest['score'] ?? null,
         'update_available' => !empty($updateStatus['update_available']),
         'update_latest' => (string) ($updateStatus['latest'] ?? ''),
         'update_can_run' => ms_update_can_run($config),
         'update_api_url' => ms_api_url($config, ['api' => 'update', 'action' => 'check']),
-        'update_web_check_url' => ms_url($scriptname, ['update_action' => 'check']),
+        'update_web_check_url' => ms_page_url($config, ['update_action' => 'check']),
         'update_flash' => ms_update_flash_from_request(),
     ];
 }

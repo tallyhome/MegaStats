@@ -392,8 +392,10 @@ function ms_config_build_page_view(array $config): array
         'fields' => ms_config_fields_for_file($fileId, $definitions),
         'config_writable' => ms_config_is_writable($definitions),
         'scriptname' => $config['scriptname'],
-        'dashboard_url' => ms_url($config['scriptname']),
-        'config_url' => ms_url($config['scriptname'], ['page' => 'config']),
+        'dashboard_url' => ms_page_url($config, []),
+        'config_url' => ms_page_url($config, ['page' => 'config']),
+        'mail_url' => ms_page_url($config, ['page' => 'mail']),
+        'ms_link' => static fn(array $params = []): string => ms_page_url($config, $params),
         'assets_base' => $config['assets_base'],
         'version' => $config['version'],
         'csrf_field' => ms_csrf_field(),
@@ -421,7 +423,7 @@ function ms_handle_config_page(array $config): bool
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ms_post('config_action', '') === 'save') {
         if (!empty($config['csrf_enabled']) && !ms_verify_csrf($config)) {
-            header('Location: ' . ms_url($config['scriptname'], ['page' => 'config', 'saved' => 'csrf']));
+            header('Location: ' . ms_page_url($config, ['page' => 'config', 'saved' => 'csrf']));
             exit;
         }
 
@@ -432,7 +434,7 @@ function ms_handle_config_page(array $config): bool
             ms_log($config, 'activity', 'Config saved: ' . $fileId);
         }
 
-        header('Location: ' . ms_url($config['scriptname'], [
+        header('Location: ' . ms_page_url($config, [
             'page' => 'config',
             'file' => $fileId,
             'saved' => $ok ? 'ok' : 'fail',
@@ -456,7 +458,7 @@ function ms_render_config_page_whm(array $config): void
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ms_post('config_action', '') === 'save') {
         if (!empty($config['csrf_enabled']) && !ms_verify_csrf($config)) {
-            header('Location: ' . ms_url($config['scriptname'], ['page' => 'config', 'saved' => 'csrf']));
+            header('Location: ' . ms_page_url($config, ['page' => 'config', 'saved' => 'csrf']));
             exit;
         }
 
@@ -467,7 +469,7 @@ function ms_render_config_page_whm(array $config): void
             ms_log($config, 'activity', 'Config saved: ' . $fileId);
         }
 
-        header('Location: ' . ms_url($config['scriptname'], [
+        header('Location: ' . ms_page_url($config, [
             'page' => 'config',
             'file' => $fileId,
             'saved' => $ok ? 'ok' : 'fail',
