@@ -36,6 +36,11 @@ $statusIcon = static function (?bool $ok): string {
             <input type="hidden" name="mail_action" value="scan">
             <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-arrow-repeat me-1"></i>Relancer l'analyse</button>
         </form>
+        <form method="post" action="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="d-inline">
+            <?= $csrf_field ?? '' ?>
+            <input type="hidden" name="mail_action" value="scan_all">
+            <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-hdd-network me-1"></i>Toutes les IP</button>
+        </form>
         <?php endif; ?>
     </div>
 </div>
@@ -62,6 +67,14 @@ $selected_ip = null;
 $primary_ip = $scan['ip'] ?? null;
 require MEGASTATS_ROOT . '/templates/mail/partials/ip-list.php';
 ?>
+<?php endif; ?>
+
+<?php if (!empty($exim)): ?>
+<?php require MEGASTATS_ROOT . '/templates/mail/partials/exim-panel.php'; ?>
+<?php endif; ?>
+
+<?php if (!empty($ip_matrix)): ?>
+<?php require MEGASTATS_ROOT . '/templates/mail/partials/ip-matrix.php'; ?>
 <?php endif; ?>
 
 <div class="row g-3 mb-3">
@@ -96,10 +109,12 @@ require MEGASTATS_ROOT . '/templates/mail/partials/ip-list.php';
                     <li><?= $statusIcon($scan['dns']['dkim']['ok'] ?? false) ?> DKIM</li>
                     <li><?= $statusIcon($scan['dns']['dmarc']['ok'] ?? false) ?> DMARC</li>
                     <li><?= $statusIcon($scan['dns']['ptr']['ok'] ?? false) ?> rDNS (PTR)</li>
+                    <li><?= $statusIcon($scan['dns']['fcrdns']['ok'] ?? false) ?> FCrDNS <span class="text-secondary small ms-2"><?= ms_e($scan['dns']['fcrdns']['detail'] ?? '') ?></span></li>
                     <li class="border-top my-2"></li>
                     <li><?= $statusIcon($scan['smtp']['tls']['ok'] ?? false) ?> TLS</li>
                     <li><?= $statusIcon($scan['smtp']['banner']['ok'] ?? false) ?> SMTP Banner</li>
                     <li><?= $statusIcon($scan['smtp']['helo']['ok'] ?? false) ?> HELO/EHLO</li>
+                    <li><?= $statusIcon($scan['smtp']['helo_fcrdns']['ok'] ?? false) ?> HELO ↔ FCrDNS <span class="text-secondary small ms-2"><?= ms_e($scan['smtp']['helo_fcrdns']['detail'] ?? '') ?></span></li>
                 </ul>
             </div>
         </div>

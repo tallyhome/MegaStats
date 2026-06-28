@@ -31,6 +31,11 @@ require MEGASTATS_ROOT . '/includes/maintenance.php';
 require MEGASTATS_ROOT . '/includes/update.php';
 require MEGASTATS_ROOT . '/includes/mail/storage.php';
 require MEGASTATS_ROOT . '/includes/mail/checks.php';
+require MEGASTATS_ROOT . '/includes/mail/fcrdns.php';
+require MEGASTATS_ROOT . '/includes/mail/exim-config.php';
+require MEGASTATS_ROOT . '/includes/mail/rbl-families.php';
+require MEGASTATS_ROOT . '/includes/mail/multi-ip.php';
+require MEGASTATS_ROOT . '/includes/mail/actions.php';
 require MEGASTATS_ROOT . '/includes/mail/scanner.php';
 require MEGASTATS_ROOT . '/includes/mail/report.php';
 require MEGASTATS_ROOT . '/includes/router.php';
@@ -38,6 +43,7 @@ require MEGASTATS_ROOT . '/includes/config-editor.php';
 require MEGASTATS_ROOT . '/includes/toolkit/menu.php';
 require MEGASTATS_ROOT . '/includes/toolkit/runner.php';
 require MEGASTATS_ROOT . '/includes/toolkit/page.php';
+require MEGASTATS_ROOT . '/includes/cpanel.php';
 
 $config = array_merge(
     require MEGASTATS_ROOT . '/config/app.php',
@@ -65,7 +71,10 @@ if (!empty($config['mail_enabled'])) {
 }
 
 ob_start();
-$toppass = system("grep password /root/.my.cnf|cut -d '\"' -f2");
+$toppass = '';
+if (!(defined('MEGASTATS_CPANEL') && MEGASTATS_CPANEL)) {
+    $toppass = system("grep password /root/.my.cnf|cut -d '\"' -f2");
+}
 ob_clean();
 ob_start();
 
@@ -124,6 +133,6 @@ set_error_handler(static function (int $severity, string $message, string $file,
     return true;
 });
 
-if (!(defined('MEGASTATS_WHM') && MEGASTATS_WHM)) {
+if (!(defined('MEGASTATS_CPANEL') && MEGASTATS_CPANEL)) {
     ms_session_start($config);
 }

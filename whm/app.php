@@ -118,6 +118,7 @@ WHM::footer();
 
 echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>' . "\n";
 if ($isMailPage) {
+    echo '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/mail.js"></script>' . "\n";
 } elseif (!$isConfigPage && !$isToolkitPage) {
     echo '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>' . "\n";

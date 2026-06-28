@@ -11,7 +11,7 @@ Panneau de monitoring serveur (PHP 8.2+) pour **cPanel/WHM** et installation sta
 
 > **WHM root only** — le plugin WHM nécessite un accès **root** SSH et une session WHM (port 2087).
 
-**Version actuelle :** 3.2.0 — voir [CHANGELOG.md](CHANGELOG.md).
+**Version actuelle :** 3.3.0 — voir [CHANGELOG.md](CHANGELOG.md).
 
 ## Compatibilité
 
@@ -116,6 +116,12 @@ Module **OBI2 Server Toolkit v1.0** intégré à MegaStats :
 | **SSH** | Menu interactif complet (comptes, IP, Laravel, WordPress…) |
 
 Les actions sensibles (déplacer un compte, changer l’IP, etc.) passent par le menu SSH ; les diagnostics rapides sont exécutables depuis WHM.
+
+### Plugin cPanel (v3.3+)
+
+Les utilisateurs cPanel voient **uniquement l’IP de leur compte** : RBL, PTR, FCrDNS, SPF/DKIM/DMARC, assistant délisting.
+
+Accès : **cPanel → MegaStats Mail** (après `./whm/install.sh` qui installe le plugin cPanel).
 
 ## Soutenir MegaStats
 

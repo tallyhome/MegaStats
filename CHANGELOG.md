@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.3.0 — 2026-06-24
+
+### Ajouté
+- **Mail Configuration multi-IP** : tableau PTR, A, SPF, DKIM, DMARC, FCrDNS, HELO, score par IP
+- **RBL par familles** : accordéon Spamhaus/UCEProtect… + sous-listes + niveau d'impact
+- **Assistant délisting** : procédure de retrait, portail, modèle ticket, revérification
+- **Panneau Exim** : version, mailips, mailhelo, Send mail from account IP, incohérences
+- **Plugin cPanel** : réputation mail pour l'IP du compte connecté (`/3rdparty/megastats/mail.cgi`)
+- Boutons **Analyser toutes les IP** / **Analyser cette IP**
+
+### Modifié
+- Toolkit `exim-status.sh` : format détaillé Exim
+
 ## 3.2.3 — 2026-06-24
 
 ### Modifié

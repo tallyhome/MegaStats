@@ -38,26 +38,19 @@ function ms_handle_mail_page(array $config): bool
         return true;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ms_post('mail_action', '') === 'scan') {
-        if (!empty($config['csrf_enabled']) && !ms_verify_csrf($config)) {
-            header('Location: ' . ms_url($config['scriptname'], ['page' => 'mail', 'scan' => 'csrf']));
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $flashCode = ms_mail_handle_post_action($config);
+        if ($flashCode !== null) {
+            header('Location: ' . ms_url($config['scriptname'], ['page' => 'mail', 'scan' => $flashCode]));
             exit;
         }
-
-        ms_mail_run_scan($config);
-        header('Location: ' . ms_url($config['scriptname'], ['page' => 'mail', 'scan' => 'ok']));
-        exit;
     }
 
     ms_start_output_buffer($config);
     $view = ms_mail_build_page_view($config);
     $view['auth_mode'] = $config['auth_mode'] ?? 'password';
     $view['deployment'] = $config['deployment'] ?? 'standalone';
-    $view['scan_flash'] = match ((string) ms_get('scan', '')) {
-        'ok' => 'Analyse terminée.',
-        'csrf' => 'Jeton de sécurité invalide.',
-        default => '',
-    };
+    $view['scan_flash'] = ms_mail_scan_flash_message((string) ms_get('scan', ''));
 
     ms_render_template($view['mail_template'] ?? 'mail/overview', $view);
     return true;
@@ -65,14 +58,12 @@ function ms_handle_mail_page(array $config): bool
 
 function ms_render_mail_page_whm(array $config): void
 {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string) ms_post('mail_action', '') === 'scan') {
-        if (!empty($config['csrf_enabled']) && !ms_verify_csrf($config)) {
-            header('Location: ' . ms_url($config['scriptname'], ['page' => 'mail', 'scan' => 'csrf']));
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $flashCode = ms_mail_handle_post_action($config);
+        if ($flashCode !== null) {
+            header('Location: ' . ms_url($config['scriptname'], ['page' => 'mail', 'scan' => $flashCode]));
             exit;
         }
-        ms_mail_run_scan($config);
-        header('Location: ' . ms_url($config['scriptname'], ['page' => 'mail', 'scan' => 'ok']));
-        exit;
     }
 
     ms_start_output_buffer($config);
@@ -80,11 +71,7 @@ function ms_render_mail_page_whm(array $config): void
     $view['whm_embedded'] = true;
     $view['auth_mode'] = 'whm';
     $view['deployment'] = 'whm';
-    $view['scan_flash'] = match ((string) ms_get('scan', '')) {
-        'ok' => 'Analyse terminée.',
-        'csrf' => 'Jeton de sécurité invalide.',
-        default => '',
-    };
+    $view['scan_flash'] = ms_mail_scan_flash_message((string) ms_get('scan', ''));
 
     $assetsBase = ms_e($config['assets_base']);
     echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">' . "\n";

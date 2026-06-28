@@ -55,7 +55,14 @@ function ms_mail_run_scan(array $config): array
         'ptr' => ms_mail_check_ptr($ip, $domain),
     ];
 
+    $fcrdns = ms_mail_check_fcrdns($ip, $domain);
+    if (!empty($fcrdns['hostname'])) {
+        $dns['ptr'] = ms_mail_check_ptr($ip, (string) $fcrdns['hostname']);
+    }
+    $dns['fcrdns'] = ms_mail_status((bool) ($fcrdns['ok'] ?? false), $fcrdns['detail'] ?? '');
+
     $rbl = ms_mail_check_rbl($ip);
+    $rblGrouped = ms_mail_group_rbl_by_family($rbl);
     $rblListed = $rbl['listed'];
 
     $ipsRbl = [];
@@ -66,6 +73,10 @@ function ms_mail_run_scan(array $config): array
     $smtpHost = (string) ($config['mail_smtp_host'] ?? '127.0.0.1');
     $smtpPort = (int) ($config['mail_smtp_port'] ?? 25);
     $smtp = ms_mail_smtp_probe($smtpHost, $smtpPort, $helo);
+    $smtp['helo_fcrdns'] = ms_mail_check_helo_fcrdns($smtp['helo'] ?? ms_mail_status(false), $fcrdns);
+
+    $ipMatrix = ms_mail_build_ip_matrix($config);
+    $exim = ms_mail_get_exim_config();
 
     $spamassassin = ms_mail_check_spamassassin();
 
@@ -94,9 +105,12 @@ function ms_mail_run_scan(array $config): array
         'dns_ok' => $dnsOk,
         'smtp' => $smtp,
         'rbl' => $rbl,
+        'rbl_grouped' => $rblGrouped,
         'ips_rbl' => $ipsRbl,
         'rbl_listed' => (int) ($ipsRbl[$ip]['listed_count'] ?? count($rblListed)),
         'rbl_featured' => array_slice($rbl['all'], 0, 5),
+        'ip_matrix' => $ipMatrix,
+        'exim' => $exim,
         'spamassassin' => $spamassassin,
         'microsoft' => ms_mail_check_microsoft_snds($config, $ip),
         'google' => ms_mail_check_google_postmaster($domain),
@@ -182,4 +196,47 @@ function ms_mail_run_cron(array $config): array
     }
 
     return $result;
+}
+
+function ms_mail_refresh_ip(array $config, string $ip): array
+{
+    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        return ms_mail_run_scan($config);
+    }
+
+    $scan = ms_mail_load_latest($config) ?? ms_mail_run_scan($config);
+    $domain = $scan['domain'] ?? ms_mail_detect_domains($config)[0] ?? 'localhost';
+    $accountMap = ms_mail_map_ips_to_accounts();
+    $row = ms_mail_analyze_ip_row($ip, $config, $domain, $accountMap);
+
+    $scan['ips_rbl'][$ip] = $row['rbl'];
+    if (!in_array($ip, $scan['ips'] ?? [], true)) {
+        $scan['ips'][] = $ip;
+    }
+
+    $matrix = $scan['ip_matrix']['rows'] ?? [];
+    $found = false;
+    foreach ($matrix as $i => $existing) {
+        if (($existing['ip'] ?? '') === $ip) {
+            $matrix[$i] = $row;
+            $found = true;
+            break;
+        }
+    }
+    if (!$found) {
+        $matrix[] = $row;
+    }
+    $scan['ip_matrix'] = ['domain' => $domain, 'rows' => $matrix, 'count' => count($matrix)];
+
+    if (($scan['ip'] ?? '') === $ip) {
+        $scan['rbl'] = $row['rbl'];
+        $scan['rbl_grouped'] = $row['rbl_grouped'];
+        $scan['rbl_listed'] = $row['rbl_listed'];
+    }
+
+    $scan['ts'] = time();
+    $scan['score'] = ms_mail_compute_score($scan);
+    ms_mail_save_scan($config, $scan);
+
+    return $scan;
 }

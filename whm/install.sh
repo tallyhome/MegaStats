@@ -85,6 +85,10 @@ chmod 755 /var/cpanel/apps
 
 bash "$PLUGIN_DIR/rebuild-menu.sh"
 
+if [[ -x "$SRC_DIR/cpanel/install-cpanel.sh" ]]; then
+    bash "$SRC_DIR/cpanel/install-cpanel.sh"
+fi
+
 /scripts/restartsrv_cpsrvd --wait 2>/dev/null || true
 
 cat > "$CRON_FILE" <<EOF

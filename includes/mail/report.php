@@ -113,12 +113,17 @@ function ms_mail_build_page_view(array $config): array
     $mailTemplate = 'mail/overview';
     $pageTitle = 'Mail & délivrabilité · MegaStats';
     $rbl = null;
+    $delistGuide = null;
+    $delistZone = null;
 
     if ($selectedIp !== '' && filter_var($selectedIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
         $forceLive = (string) ms_get('refresh', '') === '1';
         $rbl = ms_mail_get_rbl_for_ip($config, $selectedIp, $forceLive);
+        $rbl['grouped'] = ms_mail_group_rbl_by_family($rbl);
         $mailTemplate = 'mail/rbl';
         $pageTitle = 'Blacklist · ' . $selectedIp . ' · MegaStats';
+        $delistZone = trim((string) ms_get('delist', ''));
+        $delistGuide = $delistZone !== '' ? ms_mail_delisting_guide($delistZone) : null;
     }
 
     return [
@@ -132,6 +137,10 @@ function ms_mail_build_page_view(array $config): array
         'mail_url' => ms_page_url($config, ['page' => 'mail']),
         'selected_ip' => $selectedIp !== '' ? $selectedIp : null,
         'rbl' => $rbl,
+        'delist_guide' => $delistGuide,
+        'delist_zone' => $delistZone,
+        'ip_matrix' => $scan['ip_matrix'] ?? null,
+        'exim' => $scan['exim'] ?? null,
         'all_ips' => $allIps,
         'ip_summaries' => $ipSummaries,
         'assets_base' => $config['assets_base'],
