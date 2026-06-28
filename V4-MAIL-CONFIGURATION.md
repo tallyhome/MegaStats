@@ -266,6 +266,7 @@ Scénario typique (comme `serv.obi2.net`) :
 - Hostnames `mail-r1.domain.tld` … `mail-rN.domain.tld`
 - PTR gérés côté panel ou ticket provider
 - SPF unique incluant toutes les `ip4:`
+- **DNS local PowerDNS** (`pdns`) sur cPanel — le toolkit v3.2.2+ le détecte correctement (plus de faux « named inactif »)
 
 Cette fonctionnalité v4 vise exactement ce cas d’usage — aujourd’hui laborieux sans outil centralisé dans WHM.
 

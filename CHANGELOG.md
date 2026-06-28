@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.2 — 2026-06-24
+
+### Corrigé
+- **Server Toolkit — DNS** : détection **PowerDNS** (`pdns` / `pdns_server`) en plus de BIND (`named`) ; plus de faux « DNS inactif » sur serveurs cPanel PowerDNS
+
 ## 3.2.1 — 2026-06-24
 
 ### Ajouté
