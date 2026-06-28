@@ -214,56 +214,6 @@ function ms_mail_status(bool $ok, ?string $detail = null): array
     return ['ok' => $ok, 'detail' => $detail ?? ''];
 }
 
-function ms_mail_check_rbl(string $ip): array
-{
-    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        return [
-            'listed' => [],
-            'clean' => [],
-            'all' => [],
-            'listed_count' => 0,
-            'total_zones' => 0,
-            'duration_ms' => 0,
-        ];
-    }
-
-    $rev = implode('.', array_reverse(explode('.', $ip)));
-    $listed = [];
-    $clean = [];
-    $started = microtime(true);
-
-    foreach (ms_mail_rbl_zones() as $zone => $label) {
-        $query = $rev . '.' . $zone;
-        $t0 = microtime(true);
-        $listedOnZone = @checkdnsrr($query, 'A') || @checkdnsrr($query, 'AAAA');
-        $ms = (int) round((microtime(true) - $t0) * 1000);
-
-        $entry = [
-            'zone' => $zone,
-            'label' => $label,
-            'listed' => $listedOnZone,
-            'response_ms' => $ms,
-            'reason' => $listedOnZone ? ('Listed on ' . $label) : 'OK',
-        ];
-        if ($listedOnZone) {
-            $listed[] = $entry;
-        } else {
-            $clean[] = $entry;
-        }
-    }
-
-    $all = array_merge($listed, $clean);
-
-    return [
-        'listed' => $listed,
-        'clean' => $clean,
-        'all' => $all,
-        'listed_count' => count($listed),
-        'total_zones' => count($all),
-        'duration_ms' => (int) round((microtime(true) - $started) * 1000),
-    ];
-}
-
 function ms_mail_get_rbl_for_ip(array $config, string $ip, bool $forceLive = false): array
 {
     if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
@@ -455,8 +405,27 @@ function ms_mail_check_microsoft_snds(array $config, string $ip): array
         'ok' => true,
         'level' => 'good',
         'label' => 'SNDS configuré',
-        'detail' => 'Consultez le portail SNDS pour le détail IP (API manuelle requise)',
+        'detail' => 'Consultez le portail SNDS pour le détail IP ' . $ip,
     ];
+}
+
+function ms_mail_check_microsoft_for_ip(array $config, string $ip, array $rblGrouped): array
+{
+    $base = ms_mail_check_microsoft_snds($config, $ip);
+    if ($key = trim((string) ($config['mail_snds_key'] ?? ''))) {
+        return $base;
+    }
+
+    $critical = (int) ($rblGrouped['critical_families'] ?? 0);
+    $listed = (int) ($rblGrouped['listed_count'] ?? 0);
+    if ($critical > 0) {
+        return ['ok' => false, 'level' => 'bad', 'label' => 'RBL critique', 'detail' => $listed . ' liste(s) — risque Outlook'];
+    }
+    if ($listed > 0) {
+        return ['ok' => null, 'level' => 'warn', 'label' => 'Surveillance', 'detail' => 'RBL mineures détectées'];
+    }
+
+    return ['ok' => true, 'level' => 'good', 'label' => 'OK', 'detail' => 'Heuristique (SNDS non configuré)'];
 }
 
 function ms_mail_check_google_postmaster(string $domain): array

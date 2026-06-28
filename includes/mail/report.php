@@ -148,6 +148,7 @@ function ms_mail_build_page_view(array $config): array
         'pagegen' => '',
         'csrf_field' => ms_csrf_field(),
         'can_scan' => true,
+        'config' => $config,
         'storage_ok' => ms_mail_ensure_storage($config),
         'mail_path' => ms_mail_path($config),
         'whm_embedded' => !empty($config['deployment']) && $config['deployment'] === 'whm',

@@ -41,6 +41,18 @@ $statusIcon = static function (?bool $ok): string {
             <input type="hidden" name="mail_action" value="scan_all">
             <button type="submit" class="btn btn-sm btn-outline-primary"><i class="bi bi-hdd-network me-1"></i>Toutes les IP</button>
         </form>
+        <a href="<?= ms_e(ms_url($scriptname, ['page' => 'mail', 'export' => '1'])) ?>" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-download me-1"></i>Export rapport
+        </a>
+        <?php if (!empty($scan['ip']) && !empty($config['mail_auto_fix_enabled'] ?? true)): ?>
+        <form method="post" action="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="d-inline"
+              onsubmit="return confirm('Appliquer les corrections DNS automatiques pour <?= ms_e($scan['ip']) ?> ? (root requis)');">
+            <?= $csrf_field ?? '' ?>
+            <input type="hidden" name="mail_action" value="auto_fix_ip">
+            <input type="hidden" name="fix_ip" value="<?= ms_e($scan['ip']) ?>">
+            <button type="submit" class="btn btn-sm btn-warning text-dark"><i class="bi bi-magic me-1"></i>Corriger automatiquement</button>
+        </form>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
@@ -82,8 +94,16 @@ require MEGASTATS_ROOT . '/templates/mail/partials/ip-list.php';
         <div class="card ms-card h-100 text-center">
             <div class="card-body">
                 <div class="text-secondary small text-uppercase">Score global</div>
+                <?php $grade = $scan['grade'] ?? ms_mail_grade_from_score((int) ($scan['score'] ?? 0)); ?>
                 <div class="display-4 fw-bold"><?= (int) ($scan['score'] ?? 0) ?></div>
-                <div class="text-secondary">/ 100</div>
+                <div class="text-secondary">/ 100 · grade <span class="badge text-bg-<?= ($grade['level'] ?? 'warn') === 'good' ? 'success' : (($grade['level'] ?? '') === 'bad' ? 'danger' : 'warning') ?>"><?= ms_e($grade['grade'] ?? '?') ?></span></div>
+                <?php if (!empty($scan['score_breakdown'])): ?>
+                <ul class="list-unstyled small text-start mt-3 mb-0">
+                    <?php foreach ($scan['score_breakdown'] as $item): ?>
+                    <li class="text-danger"><?= ms_e($item['label'] ?? '') ?> <?= (int) ($item['delta'] ?? 0) ?> <span class="text-secondary">— <?= ms_e($item['reason'] ?? '') ?></span></li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php endif; ?>
                 <div class="small text-secondary mt-2">Dernière analyse : <?= ms_e(date('d/m/Y H:i', (int) ($scan['ts'] ?? time()))) ?></div>
                 <div class="small">IP <?= ms_e($scan['ip'] ?? '?') ?> · <?= ms_e($scan['domain'] ?? '?') ?></div>
             </div>

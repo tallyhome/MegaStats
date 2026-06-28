@@ -18,6 +18,22 @@ $cell = static function (?bool $ok): string {
     }
     return '<span class="text-warning" title="Partiel">⚠️</span>';
 };
+
+$msCell = static function (array $row): string {
+    $level = $row['level'] ?? 'unknown';
+    return ms_mail_level_dot($level) . ' <span class="small">' . ms_e($row['label'] ?? '') . '</span>';
+};
+
+$gradeBadge = static function (array $grade): string {
+    $g = $grade['grade'] ?? '?';
+    $level = $grade['level'] ?? 'warn';
+    $cls = match ($level) {
+        'good' => 'success',
+        'warn' => 'warning',
+        default => 'danger',
+    };
+    return '<span class="badge text-bg-' . $cls . '">' . ms_e($g) . '</span>';
+};
 ?>
 
 <div class="card ms-card mb-3">
@@ -38,6 +54,7 @@ $cell = static function (?bool $ok): string {
                     <tr>
                         <th>IP</th>
                         <th>Compte</th>
+                        <th>Mail IP</th>
                         <th>PTR</th>
                         <th>A</th>
                         <th>SPF</th>
@@ -46,6 +63,7 @@ $cell = static function (?bool $ok): string {
                         <th>FCrDNS</th>
                         <th>HELO</th>
                         <th>RBL</th>
+                        <th>Microsoft</th>
                         <th>Score</th>
                         <th></th>
                     </tr>
@@ -57,6 +75,7 @@ $cell = static function (?bool $ok): string {
                             <a href="<?= ms_e(ms_url($scriptname, ['page' => 'mail', 'ip' => $row['ip']])) ?>"><?= ms_e($row['ip']) ?></a>
                         </td>
                         <td class="small"><?= ms_e($row['account'] ?? '—') ?></td>
+                        <td><?= $cell($row['mail_ip']['ok'] ?? null) ?></td>
                         <td><?= $cell($row['ptr']['ok'] ?? null) ?></td>
                         <td><?= $cell($row['a']['ok'] ?? null) ?></td>
                         <td><?= $cell($row['spf']['ok'] ?? null) ?></td>
@@ -72,7 +91,11 @@ $cell = static function (?bool $ok): string {
                                 <span class="badge text-bg-success">0</span>
                             <?php endif; ?>
                         </td>
-                        <td><span class="fw-semibold"><?= (int) ($row['score'] ?? 0) ?></span></td>
+                        <td class="small"><?= $msCell($row['microsoft'] ?? []) ?></td>
+                        <td>
+                            <?= $gradeBadge($row['grade'] ?? []) ?>
+                            <span class="small text-secondary ms-1"><?= (int) ($row['score'] ?? 0) ?></span>
+                        </td>
                         <td>
                             <form method="post" action="<?= ms_e($mail_url) ?>" class="d-inline">
                                 <?= $csrf_field ?>

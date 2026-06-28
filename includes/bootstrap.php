@@ -31,10 +31,14 @@ require MEGASTATS_ROOT . '/includes/maintenance.php';
 require MEGASTATS_ROOT . '/includes/update.php';
 require MEGASTATS_ROOT . '/includes/mail/storage.php';
 require MEGASTATS_ROOT . '/includes/mail/checks.php';
+require MEGASTATS_ROOT . '/includes/mail/rbl-parallel.php';
 require MEGASTATS_ROOT . '/includes/mail/fcrdns.php';
 require MEGASTATS_ROOT . '/includes/mail/exim-config.php';
 require MEGASTATS_ROOT . '/includes/mail/mailips.php';
 require MEGASTATS_ROOT . '/includes/mail/rbl-families.php';
+require MEGASTATS_ROOT . '/includes/mail/grades.php';
+require MEGASTATS_ROOT . '/includes/mail/dns-fix.php';
+require MEGASTATS_ROOT . '/includes/mail/export.php';
 require MEGASTATS_ROOT . '/includes/mail/multi-ip.php';
 require MEGASTATS_ROOT . '/includes/mail/actions.php';
 require MEGASTATS_ROOT . '/includes/mail/scanner.php';
@@ -45,6 +49,7 @@ require MEGASTATS_ROOT . '/includes/toolkit/menu.php';
 require MEGASTATS_ROOT . '/includes/toolkit/runner.php';
 require MEGASTATS_ROOT . '/includes/toolkit/page.php';
 require MEGASTATS_ROOT . '/includes/cpanel.php';
+require MEGASTATS_ROOT . '/includes/license/client.php';
 
 $config = array_merge(
     require MEGASTATS_ROOT . '/config/app.php',
@@ -52,6 +57,7 @@ $config = array_merge(
     require MEGASTATS_ROOT . '/config/security.php',
     require MEGASTATS_ROOT . '/config/mail.php',
     require MEGASTATS_ROOT . '/config/toolkit.php',
+    require MEGASTATS_ROOT . '/config/license.php',
     ['alerts' => require MEGASTATS_ROOT . '/config/alerts.php']
 );
 

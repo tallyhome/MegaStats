@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.0.0 — 2026-06-28
+
+### Ajouté
+- **Grades A+ → F** style SSL Labs + détail des pénalités sur le score global
+- **Colonne Mail IP** et **Microsoft** (heuristique RBL + SNDS) dans le tableau multi-IP
+- Bouton **Corriger automatiquement** : A, SPF, DKIM, DMARC via uapi (root)
+- **Scan RBL parallèle** (`dig` en bash) pour accélérer les vérifications
+- **Export rapport** HTML (`?page=mail&export=1`)
+- **AdminLicence** : `install_id` persistant + heartbeat cron (serial optionnel)
+
+### Modifié
+- Microsoft sur IP principale : heuristique RBL si SNDS non configuré
+- **[V4-MAIL-CONFIGURATION.md](V4-MAIL-CONFIGURATION.md)** : statut implémenté vs reste
+
 ## 3.5.0 — 2026-06-28
 
 ### Ajouté
@@ -41,9 +55,11 @@
 ### Modifié
 - README / PRIVACY : renvoi vers ADMINLICENCE.md (section allégée)
 
-## Roadmap v4.0 (non publiée)
+## Roadmap v4.1+ (non publiée)
 
-- **[V4-MAIL-CONFIGURATION.md](V4-MAIL-CONFIGURATION.md)** : section « Mail Configuration » multi-IP (PTR, A, SPF, DKIM, DMARC, FCrDNS, Microsoft), bouton « Corriger automatiquement », rapport réputation — **spécification uniquement**
+- Export PDF rapport réputation
+- API SNDS Microsoft live par IP
+- PTR assisté WHM/provider
 
 ## 3.2.0 — 2026-06-24
 

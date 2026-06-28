@@ -33,10 +33,17 @@ function ms_mail_analyze_ip_row(string $ip, array $config, string $domain, array
     $rblGrouped = ms_mail_group_rbl_by_family($rbl);
 
     $account = $accountMap[$ip] ?? null;
+    $mailIpOk = $account !== null
+        && ms_mail_send_from_account_ip_enabled()
+        && ms_mail_account_uses_dedicated_ip($account, $ip);
+    $microsoft = ms_mail_check_microsoft_for_ip($config, $ip, $rblGrouped);
+    $score = ms_mail_compute_ip_score($ptr, $fcrdns, $spfIp, $dkim, $dmarc, $heloCoherence, $rblGrouped);
 
     return [
         'ip' => $ip,
         'account' => $account,
+        'mail_ip' => ms_mail_status($mailIpOk, $mailIpOk ? 'Account IP activé' : 'Vérifier sendmailfromaccountip / IP compte'),
+        'microsoft' => $microsoft,
         'ptr' => $ptr,
         'a' => ms_mail_status($aOk, $aOk ? implode(', ', $fcrdns['a_records']) : 'A manquant ou incorrect'),
         'fcrdns' => ms_mail_status((bool) ($fcrdns['ok'] ?? false), $fcrdns['detail'] ?? ''),
@@ -47,7 +54,8 @@ function ms_mail_analyze_ip_row(string $ip, array $config, string $domain, array
         'rbl' => $rbl,
         'rbl_grouped' => $rblGrouped,
         'rbl_listed' => (int) ($rbl['listed_count'] ?? 0),
-        'score' => ms_mail_compute_ip_score($ptr, $fcrdns, $spfIp, $dkim, $dmarc, $heloCoherence, $rblGrouped),
+        'score' => $score,
+        'grade' => ms_mail_grade_from_score($score),
     ];
 }
 

@@ -28,6 +28,10 @@ function ms_handle_mail_page(array $config): bool
         return false;
     }
 
+    if (ms_mail_handle_export($config)) {
+        return true;
+    }
+
     if (defined('MEGASTATS_WHM') && MEGASTATS_WHM) {
         return false;
     }
@@ -58,6 +62,10 @@ function ms_handle_mail_page(array $config): bool
 
 function ms_render_mail_page_whm(array $config): void
 {
+    if (ms_mail_handle_export($config)) {
+        return;
+    }
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flashCode = ms_mail_handle_post_action($config);
         if ($flashCode !== null) {

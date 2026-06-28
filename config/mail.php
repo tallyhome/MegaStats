@@ -37,4 +37,8 @@ return [
     // Chemin script mise à jour (WHM)
     'update_script' => '/opt/megastats/whm/update.sh',
     'update_git_repo' => 'tallyhome/MegaStats',
+    'mail_hostname_prefix' => 'mail-r',
+    'mail_hostname_domain' => '',
+    'mail_auto_fix_enabled' => true,
+    'mail_auto_fix_dkim' => true,
 ];

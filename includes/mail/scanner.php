@@ -112,7 +112,7 @@ function ms_mail_run_scan(array $config): array
         'ip_matrix' => $ipMatrix,
         'exim' => $exim,
         'spamassassin' => $spamassassin,
-        'microsoft' => ms_mail_check_microsoft_snds($config, $ip),
+        'microsoft' => ms_mail_check_microsoft_for_ip($config, $ip, $rblGrouped),
         'google' => ms_mail_check_google_postmaster($domain),
         'yahoo' => ms_mail_check_yahoo($rblListed),
         'smtp_tests' => $smtpTests,
@@ -120,6 +120,8 @@ function ms_mail_run_scan(array $config): array
     ];
 
     $scan['score'] = ms_mail_compute_score($scan);
+    $scan['grade'] = ms_mail_grade_from_score((int) $scan['score']);
+    $scan['score_breakdown'] = ms_mail_score_breakdown($scan);
 
     ms_mail_save_scan($config, $scan);
     ms_mail_process_rbl_alerts($config, $scan);
@@ -195,6 +197,8 @@ function ms_mail_run_cron(array $config): array
         $result['report'] = ms_mail_send_daily_report($config);
     }
 
+    ms_license_maybe_heartbeat($config);
+
     return $result;
 }
 
@@ -236,6 +240,9 @@ function ms_mail_refresh_ip(array $config, string $ip): array
 
     $scan['ts'] = time();
     $scan['score'] = ms_mail_compute_score($scan);
+    $scan['grade'] = ms_mail_grade_from_score((int) $scan['score']);
+    $scan['score_breakdown'] = ms_mail_score_breakdown($scan);
+
     ms_mail_save_scan($config, $scan);
 
     return $scan;
