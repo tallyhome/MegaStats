@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.1 — 2026-06-24
+
+### Ajouté
+- **[ADMINLICENCE.md](ADMINLICENCE.md)** : spécification serial + API AdminLicence, heartbeat, comptage exact des installations, badge Shields.io
+
+### Modifié
+- README / PRIVACY : renvoi vers ADMINLICENCE.md (section allégée)
+
 ## 3.2.0 — 2026-06-24
 
 ### Ajouté
