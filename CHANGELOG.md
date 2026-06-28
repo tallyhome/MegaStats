@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.0.1 — 2026-06-28
+
+### Ajouté
+- Carte **Problèmes détectés — actions correctives** : boutons DNS et MailIPs affichés uniquement si un problème est détecté, avec liste des actions prévues
+
+### Modifié
+- Panneau Exim toujours visible (lecture live de `/etc/mailips`, même sans rescan)
+- Bouton MailIPs déplacé dans la carte corrective avec aperçu des entrées cPanel
+
 ## 4.0.0 — 2026-06-28
 
 ### Ajouté

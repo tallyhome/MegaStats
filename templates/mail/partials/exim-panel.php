@@ -18,17 +18,7 @@ $icon = static function (?bool $ok): string {
 
 <div class="card ms-card mb-3">
     <div class="card-header fw-semibold d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <span><i class="bi bi-envelope-at me-1"></i>Exim</span>
-        <?php if (!empty($can_scan)): ?>
-        <form method="post" action="<?= ms_e($mail_url ?? ms_url($scriptname ?? '', ['page' => 'mail'])) ?>"
-              class="d-inline" onsubmit="return confirm('Reconstruire /etc/mailips depuis tous les comptes cPanel et redémarrer Exim ?');">
-            <?= $csrf_field ?? '' ?>
-            <input type="hidden" name="mail_action" value="rebuild_mailips">
-            <button type="submit" class="btn btn-sm btn-warning text-dark fw-semibold">
-                <i class="bi bi-arrow-repeat me-1"></i>Reconstruire automatiquement MailIPs
-            </button>
-        </form>
-        <?php endif; ?>
+        <span><i class="bi bi-envelope-at me-1"></i>Exim — configuration sortante</span>
     </div>
     <div class="card-body">
         <div class="row g-3">

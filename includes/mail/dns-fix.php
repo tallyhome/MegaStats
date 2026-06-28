@@ -118,6 +118,34 @@ function ms_mail_apply_auto_fix(array $config, string $ip): array
     ];
 }
 
+/** @return list<string> */
+function ms_mail_auto_fix_action_labels(array $plan): array
+{
+    $labels = [];
+    foreach ($plan['actions'] ?? [] as $action) {
+        $labels[] = (string) ($action['detail'] ?? $action['type'] ?? 'Correction');
+    }
+
+    return $labels;
+}
+
+function ms_mail_auto_fix_has_actions(array $plan): bool
+{
+    return ($plan['actions'] ?? []) !== [];
+}
+
+function ms_mail_exim_needs_mailips_rebuild(array $exim): bool
+{
+    if (!($exim['mailips']['ok'] ?? false)) {
+        return true;
+    }
+    if (!($exim['send_from_account_ip']['ok'] ?? false)) {
+        return true;
+    }
+
+    return !($exim['consistent'] ?? true);
+}
+
 function ms_mail_domain_owner(string $domain): ?string
 {
     if (!is_file('/etc/userdomains')) {

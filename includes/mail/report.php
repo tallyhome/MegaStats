@@ -126,6 +126,27 @@ function ms_mail_build_page_view(array $config): array
         $delistGuide = $delistZone !== '' ? ms_mail_delisting_guide($delistZone) : null;
     }
 
+    $exim = $scan['exim'] ?? null;
+    if ($exim === null) {
+        $exim = ms_mail_get_exim_config();
+    }
+
+    $autoFixPlan = null;
+    if ($scan !== null && !empty($scan['ip']) && ($config['mail_auto_fix_enabled'] ?? true)) {
+        $fixDomain = (string) ($scan['domain'] ?? ms_mail_detect_domains($config)[0] ?? 'localhost');
+        $autoFixPlan = ms_mail_auto_fix_plan((string) $scan['ip'], $config, $fixDomain);
+    }
+
+    $mailipsPreview = null;
+    $mailipsRebuildNeeded = ms_mail_exim_needs_mailips_rebuild($exim);
+    if ($mailipsRebuildNeeded) {
+        $entries = ms_mail_collect_mailips_entries();
+        $mailipsPreview = [
+            'count' => count($entries),
+            'entries' => array_slice($entries, 0, 5),
+        ];
+    }
+
     return [
         'page_title' => $pageTitle,
         'mail_template' => $mailTemplate,
@@ -140,7 +161,10 @@ function ms_mail_build_page_view(array $config): array
         'delist_guide' => $delistGuide,
         'delist_zone' => $delistZone,
         'ip_matrix' => $scan['ip_matrix'] ?? null,
-        'exim' => $scan['exim'] ?? null,
+        'exim' => $exim,
+        'auto_fix_plan' => $autoFixPlan,
+        'mailips_rebuild_needed' => $mailipsRebuildNeeded,
+        'mailips_preview' => $mailipsPreview,
         'all_ips' => $allIps,
         'ip_summaries' => $ipSummaries,
         'assets_base' => $config['assets_base'],

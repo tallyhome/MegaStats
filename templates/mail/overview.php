@@ -44,15 +44,6 @@ $statusIcon = static function (?bool $ok): string {
         <a href="<?= ms_e(ms_url($scriptname, ['page' => 'mail', 'export' => '1'])) ?>" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-download me-1"></i>Export rapport
         </a>
-        <?php if (!empty($scan['ip']) && !empty($config['mail_auto_fix_enabled'] ?? true)): ?>
-        <form method="post" action="<?= ms_e($mail_url ?? ms_url($scriptname, ['page' => 'mail'])) ?>" class="d-inline"
-              onsubmit="return confirm('Appliquer les corrections DNS automatiques pour <?= ms_e($scan['ip']) ?> ? (root requis)');">
-            <?= $csrf_field ?? '' ?>
-            <input type="hidden" name="mail_action" value="auto_fix_ip">
-            <input type="hidden" name="fix_ip" value="<?= ms_e($scan['ip']) ?>">
-            <button type="submit" class="btn btn-sm btn-warning text-dark"><i class="bi bi-magic me-1"></i>Corriger automatiquement</button>
-        </form>
-        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
@@ -81,9 +72,15 @@ require MEGASTATS_ROOT . '/templates/mail/partials/ip-list.php';
 ?>
 <?php endif; ?>
 
+<?php endif; ?>
+
+<?php require MEGASTATS_ROOT . '/templates/mail/partials/fix-actions.php'; ?>
+
 <?php if (!empty($exim)): ?>
 <?php require MEGASTATS_ROOT . '/templates/mail/partials/exim-panel.php'; ?>
 <?php endif; ?>
+
+<?php if ($scan !== null): ?>
 
 <?php if (!empty($ip_matrix)): ?>
 <?php require MEGASTATS_ROOT . '/templates/mail/partials/ip-matrix.php'; ?>
