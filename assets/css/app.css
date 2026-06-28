@@ -199,6 +199,22 @@ html[data-bs-theme="dark"] body {
     border-bottom: none;
 }
 
+.ms-btn-delist {
+    background-color: #ffc107 !important;
+    border-color: #e0a800 !important;
+    color: #1a1d21 !important;
+    font-weight: 600;
+}
+
+.ms-btn-delist:hover {
+    background-color: #ffca2c !important;
+    color: #000 !important;
+}
+
+.ms-rbl-accordion .accordion-button:not(.collapsed) {
+    box-shadow: none;
+}
+
 @media (max-width: 767.98px) {
     .ms-pre-scroll {
         max-height: 240px;

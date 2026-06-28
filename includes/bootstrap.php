@@ -33,6 +33,7 @@ require MEGASTATS_ROOT . '/includes/mail/storage.php';
 require MEGASTATS_ROOT . '/includes/mail/checks.php';
 require MEGASTATS_ROOT . '/includes/mail/fcrdns.php';
 require MEGASTATS_ROOT . '/includes/mail/exim-config.php';
+require MEGASTATS_ROOT . '/includes/mail/mailips.php';
 require MEGASTATS_ROOT . '/includes/mail/rbl-families.php';
 require MEGASTATS_ROOT . '/includes/mail/multi-ip.php';
 require MEGASTATS_ROOT . '/includes/mail/actions.php';

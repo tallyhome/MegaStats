@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.5.0 — 2026-06-28
+
+### Ajouté
+- Bouton **Reconstruire automatiquement MailIPs** (comptes cPanel → `/etc/mailips` + restart Exim)
+- RBL : boutons **Tout ouvrir / Tout fermer** ; accordéons indépendants (plus de fermeture mutuelle)
+- Bouton **Procédure retrait** plus visible (jaune contrasté)
+
+### Corrigé
+- Accordéon RBL : suppression de `data-bs-parent` — plusieurs familles ouvertes simultanément
+
 ## 3.3.0 — 2026-06-24
 
 ### Ajouté

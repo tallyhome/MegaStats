@@ -50,7 +50,7 @@ function ms_handle_mail_page(array $config): bool
     $view = ms_mail_build_page_view($config);
     $view['auth_mode'] = $config['auth_mode'] ?? 'password';
     $view['deployment'] = $config['deployment'] ?? 'standalone';
-    $view['scan_flash'] = ms_mail_scan_flash_message((string) ms_get('scan', ''));
+    $view['scan_flash'] = ms_mail_scan_flash_message((string) ms_get('scan', ''), $config);
 
     ms_render_template($view['mail_template'] ?? 'mail/overview', $view);
     return true;
@@ -71,7 +71,7 @@ function ms_render_mail_page_whm(array $config): void
     $view['whm_embedded'] = true;
     $view['auth_mode'] = 'whm';
     $view['deployment'] = 'whm';
-    $view['scan_flash'] = ms_mail_scan_flash_message((string) ms_get('scan', ''));
+    $view['scan_flash'] = ms_mail_scan_flash_message((string) ms_get('scan', ''), $config);
 
     $assetsBase = ms_e($config['assets_base']);
     echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">' . "\n";

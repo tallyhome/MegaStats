@@ -55,7 +55,7 @@ $primary_ip = $scan['ip'] ?? null;
 </div>
 <?php endif; ?>
 
-<p class="text-secondary small mb-3">
+<p class="text-secondary small mb-2">
     <?php if (!empty($rbl['from_cache']) && !empty($rbl['scan_ts'])): ?>
         Données du scan du <?= ms_e(date('d/m/Y H:i', (int) $rbl['scan_ts'])) ?> —
     <?php else: ?>
@@ -63,6 +63,11 @@ $primary_ip = $scan['ip'] ?? null;
     <?php endif; ?>
     durée <?= (int) ($rbl['duration_ms'] ?? 0) ?> ms
 </p>
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="rblOpenAll"><i class="bi bi-arrows-expand me-1"></i>Tout ouvrir</button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="rblCloseAll"><i class="bi bi-arrows-collapse me-1"></i>Tout fermer</button>
+</div>
 
 <?php if ($delist_guide !== null && $delist_zone !== null): ?>
 <div class="card ms-card mb-3 border-warning">
@@ -82,15 +87,15 @@ $primary_ip = $scan['ip'] ?? null;
         <div class="small text-secondary mb-1">Modèle de ticket (copier) :</div>
         <textarea class="form-control form-control-sm font-monospace" rows="4" readonly onclick="this.select()"><?= ms_e(str_replace('{ip}', $selected_ip, (string) ($delist_guide['ticket'] ?? ''))) ?></textarea>
         <div class="mt-2">
-            <a href="<?= ms_e($refreshUrl) ?>" class="btn btn-sm btn-outline-success">Revérifier après 24–48 h</a>
+            <a href="<?= ms_e($refreshUrl) ?>" class="btn btn-sm btn-success">Revérifier après 24–48 h</a>
         </div>
     </div>
 </div>
 <?php endif; ?>
 
-<div class="accordion mb-3" id="rblFamilies">
+<div class="accordion mb-3 ms-rbl-accordion" id="rblFamilies">
     <?php foreach ($families as $i => $family):
-        $fid = 'fam-' . ms_e($family['id']);
+        $fid = 'fam-' . preg_replace('/[^a-z0-9_-]/', '', (string) $family['id']);
         $impactClass = match ($family['impact'] ?? 'info') {
             'critical' => 'danger',
             'important' => 'warning',
@@ -100,8 +105,9 @@ $primary_ip = $scan['ip'] ?? null;
     <div class="accordion-item ms-card border mb-2">
         <h2 class="accordion-header">
             <button class="accordion-button <?= ($family['any_listed'] ?? false) ? '' : 'collapsed' ?> py-2"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#<?= $fid ?>"
-                    aria-expanded="<?= ($family['any_listed'] ?? false) ? 'true' : 'false' ?>">
+                    type="button" data-bs-toggle="collapse" data-bs-target="#<?= ms_e($fid) ?>"
+                    aria-expanded="<?= ($family['any_listed'] ?? false) ? 'true' : 'false' ?>"
+                    aria-controls="<?= ms_e($fid) ?>">
                 <span class="fw-semibold me-2"><?= ms_e($family['label']) ?></span>
                 <span class="badge text-bg-<?= $impactClass ?> me-2"><?= ms_e($family['impact_label'] ?? '') ?></span>
                 <?php if ($family['any_listed'] ?? false): ?>
@@ -112,7 +118,7 @@ $primary_ip = $scan['ip'] ?? null;
                 <span class="text-secondary small ms-2">(<?= (int) $family['total_count'] ?> sous-listes)</span>
             </button>
         </h2>
-        <div id="<?= $fid ?>" class="accordion-collapse collapse <?= ($family['any_listed'] ?? false) ? 'show' : '' ?>" data-bs-parent="#rblFamilies">
+        <div id="<?= ms_e($fid) ?>" class="accordion-collapse collapse <?= ($family['any_listed'] ?? false) ? 'show' : '' ?>">
             <div class="accordion-body p-0">
                 <table class="table table-sm mb-0">
                     <tbody>
@@ -127,10 +133,12 @@ $primary_ip = $scan['ip'] ?? null;
                             <td class="fw-semibold"><?= ms_e($item['label'] ?? '') ?></td>
                             <td class="small text-secondary"><?= ms_e($item['reason'] ?? '') ?></td>
                             <td class="text-end small"><?= (int) ($item['response_ms'] ?? 0) ?> ms</td>
-                            <td class="text-end" style="width:140px">
+                            <td class="text-end" style="width:160px">
                                 <?php if ($isListed && $zone !== ''): ?>
                                 <a href="<?= ms_e(ms_url($scriptname, ['page' => 'mail', 'ip' => $selected_ip, 'delist' => $zone])) ?>"
-                                   class="btn btn-sm btn-outline-warning py-0">Procédure retrait</a>
+                                   class="btn btn-sm btn-warning text-dark fw-semibold ms-btn-delist">
+                                    <i class="bi bi-life-preserver me-1"></i>Procédure retrait
+                                </a>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -142,6 +150,8 @@ $primary_ip = $scan['ip'] ?? null;
     </div>
     <?php endforeach; ?>
 </div>
+
+<script>window.MegaStatsRblAccordion = true;</script>
 
 <?php
 if (empty($whm_embedded)) {

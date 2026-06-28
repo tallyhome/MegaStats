@@ -1,4 +1,35 @@
 (function () {
+    if (window.MegaStatsRblAccordion) {
+        var root = document.getElementById('rblFamilies');
+        var openBtn = document.getElementById('rblOpenAll');
+        var closeBtn = document.getElementById('rblCloseAll');
+        if (root) {
+            var panels = root.querySelectorAll('.accordion-collapse');
+            if (openBtn) {
+                openBtn.addEventListener('click', function () {
+                    panels.forEach(function (el) {
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                            bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+                        } else {
+                            el.classList.add('show');
+                        }
+                    });
+                });
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    panels.forEach(function (el) {
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                            bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).hide();
+                        } else {
+                            el.classList.remove('show');
+                        }
+                    });
+                });
+            }
+        }
+    }
+
     var data = window.MegaStatsMail && window.MegaStatsMail.history ? window.MegaStatsMail.history : [];
     var canvas = document.getElementById('mailChartScore');
     if (!canvas || typeof Chart === 'undefined' || !data.length) {
