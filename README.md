@@ -131,6 +131,8 @@ MegaStats **ne collecte aucune donnée vers l’extérieur** par défaut. Tout r
 
 Pour compter les installations et activer un **numéro de série** via **AdminLicence** (compteur exact + badge GitHub), voir **[ADMINLICENCE.md](ADMINLICENCE.md)** — spécification à implémenter en v3.3+.
 
+**Roadmap v4.0 — Mail Configuration** (tableau multi-IP, FCrDNS, correction DNS assistée) : **[V4-MAIL-CONFIGURATION.md](V4-MAIL-CONFIGURATION.md)**.
+
 ## Licence
 
 [MIT](LICENSE) — vous pouvez utiliser, modifier, vendre ou redistribuer en conservant la notice de licence.
@@ -140,3 +142,4 @@ Pour compter les installations et activer un **numéro de série** via **AdminLi
 - Diagnostic WHM : `./whm/diagnose.sh`
 - Changelog : [CHANGELOG.md](CHANGELOG.md)
 - Licence serial / AdminLicence : [ADMINLICENCE.md](ADMINLICENCE.md)
+- Roadmap v4 Mail Configuration : [V4-MAIL-CONFIGURATION.md](V4-MAIL-CONFIGURATION.md)

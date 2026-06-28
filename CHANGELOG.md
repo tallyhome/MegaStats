@@ -8,6 +8,10 @@
 ### Modifié
 - README / PRIVACY : renvoi vers ADMINLICENCE.md (section allégée)
 
+## Roadmap v4.0 (non publiée)
+
+- **[V4-MAIL-CONFIGURATION.md](V4-MAIL-CONFIGURATION.md)** : section « Mail Configuration » multi-IP (PTR, A, SPF, DKIM, DMARC, FCrDNS, Microsoft), bouton « Corriger automatiquement », rapport réputation — **spécification uniquement**
+
 ## 3.2.0 — 2026-06-24
 
 ### Ajouté
