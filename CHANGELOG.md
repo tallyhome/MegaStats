@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.3 — 2026-06-24
+
+### Modifié
+- **[V4-MAIL-CONFIGURATION.md](V4-MAIL-CONFIGURATION.md)** : score SSL Labs, RBL familles/impact (sous-listes conservées), état v3 vs v4, plugin cPanel, assistant délisting RBL
+
 ## 3.2.2 — 2026-06-24
 
 ### Corrigé

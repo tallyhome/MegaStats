@@ -12,7 +12,24 @@ MegaStats v3 affiche déjà une page **Mail & délivrabilité** solide : score g
 
 **Limitation actuelle :** les contrôles DNS sont surtout **centrés sur le domaine principal** et une IP « active ». Sur un serveur avec **plusieurs IP d’envoi** (dédiées, rotation Exim, IP revendeur), l’administrateur doit vérifier manuellement chaque IP.
 
-**Objectif v4 :** une section **« Mail Configuration »** — tableau multi-IP + actions de correction assistées.
+**Objectif v4 :** une section **« Mail Configuration »** — tableau multi-IP avec indicateurs ✅ / ❌, contrôles automatiques à chaque ajout de compte ou d’IP, et actions de correction assistées.
+
+### Checklist automatique par IP (cœur v4)
+
+Pour **chaque IP d’envoi**, le plugin vérifie sans intervention manuelle :
+
+| # | Contrôle | Colonne tableau |
+|---|----------|-----------------|
+| 1 | PTR configuré sur l’IP | **PTR** |
+| 2 | Le PTR pointe vers un nom d’hôte valide | **PTR** (détail) |
+| 3 | Ce nom possède un enregistrement **A** | **A** |
+| 4 | L’enregistrement **A** revient vers la **même IP** (FCrDNS) | **FCrDNS** |
+| 5 | L’IP est **assignée à un compte cPanel** | **Compte** (nouveau) |
+| 6 | Option cPanel **« Send mail from the account's IP address »** activée | **Mail IP** (nouveau) |
+| 7 | **SPF**, **DKIM** et **DMARC** valides pour le domaine | **SPF** · **DKIM** · **DMARC** |
+| 8 | Réputation **RBL** (alignée MXToolbox, voir section dédiée) | **RBL** (nouveau) |
+
+Sources cPanel prévues : `whmapi1 listaccts` / `accountsummary`, fichier `/var/cpanel/users/`, metadata `IP=` et `SENDER=`, option Exim **account IP** (`/etc/mailips`, `senderverify`).
 
 ---
 
@@ -24,13 +41,13 @@ Nouvel onglet ou bloc sous **Délivrabilité Email & IP** :
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  Mail Configuration                                    [Corriger auto ▼]   │
 │  Domaine : example.com · Zone DNS : example.com · Dernière vérif : 14:32   │
-├──────────┬──────┬───┬─────┬──────┬───────┬────────┬───────────┬──────────┤
-│ IP       │ PTR  │ A │ SPF │ DKIM │ DMARC │ FCrDNS │ Microsoft │ Actions  │
-├──────────┼──────┼───┼─────┼──────┼───────┼────────┼───────────┼──────────┤
-│ 54.36…161│  ✅  │ ✅ │ ✅  │  ✅  │  ✅   │   ✅   │    🟢     │ Détail   │
-│ 54.36…163│  ✅  │ ✅ │ ✅  │  ✅  │  ✅   │   ✅   │    🟢     │ Détail   │
-│ 54.36…165│  ❌  │ ✅ │ ⚠️  │  ✅  │  ✅   │   ❌   │    🟡     │ Corriger │
-└──────────┴──────┴───┴─────┴──────┴───────┴────────┴───────────┴──────────┘
+├──────────┬──────┬───┬─────┬──────┬───────┬────────┬────────┬─────────┬───────────┬──────────┤
+│ IP       │ PTR  │ A │ SPF │ DKIM │ DMARC │ FCrDNS │ Compte │ Mail IP │ RBL       │ Microsoft│
+├──────────┼──────┼───┼─────┼──────┼───────┼────────┼────────┼─────────┼───────────┼──────────┤
+│ 54.36…161│  ✅  │ ✅ │ ✅  │  ✅  │  ✅   │   ✅   │ user1  │   ✅    │ 1 🟡      │    🟢    │
+│ 54.36…163│  ✅  │ ✅ │ ✅  │  ✅  │  ✅   │   ✅   │ user2  │   ✅    │ 0 🟢      │    🟢    │
+│ 54.36…165│  ❌  │ ✅ │ ⚠️  │  ✅  │  ✅   │   ❌   │ —      │   ❌    │ 6 🔴      │    🟡    │
+└──────────┴──────┴───┴─────┴──────┴───────┴────────┴────────┴─────────┴───────────┴──────────┘
 
 Légende : ✅ OK · ⚠️ Partiel / warning · ❌ KO · 🟢 🟡 🔴 réputation Microsoft
 ```
@@ -55,6 +72,9 @@ Légende : ✅ OK · ⚠️ Partiel / warning · ❌ KO · 🟢 🟡 🔴 réput
 | **DKIM** | Sélecteur actif pour le domaine (souvent commun à toutes les IP) | `ms_mail_check_dkim()` |
 | **DMARC** | `_dmarc.domain` publié | `ms_mail_check_dmarc()` |
 | **FCrDNS** | *Forward-confirmed reverse DNS* : PTR(IP)=H **et** A(H)=IP | **Nouveau** (compose PTR + A) |
+| **Compte** | IP dédiée liée à un utilisateur cPanel (`IP=` dans userdata) | **Nouveau** |
+| **Mail IP** | « Send mail from the account's IP address » activé pour ce compte | **Nouveau** (`whmapi1` / Exim mailips) |
+| **RBL** | Détail par sous-liste + regroupement par **famille** (Spamhaus zen/PBL/SBL/XBL…) | v3 `ms_mail_check_rbl()` — **conserver les sous-listes** |
 | **Microsoft** | Réputation Outlook / SNDS / blocage | `ms_mail_check_microsoft_snds()` → API réelle v4 |
 
 ### FCrDNS (détail)
@@ -66,6 +86,87 @@ Pour chaque IP :
 3. Si les deux concordent → **FCrDNS ✅**
 
 C’est le critère le plus fiable pour la délivrabilité chez Microsoft et Gmail.
+
+---
+
+## Score global /100 (style SSL Labs)
+
+### État v3 (déjà en place)
+
+MegaStats v3 calcule déjà un **score /100** (`ms_mail_compute_score`) affiché sur la page Mail :
+
+- Pénalités DNS : SPF, DKIM, DMARC, PTR (−12 chacun si KO)
+- Pénalités SMTP : banner, HELO, TLS (−8 chacun si KO)
+- Pénalités RBL : −10 par liste (−40 max)
+- SpamAssassin, tests MX
+
+### Évolution v4 (pertinent — à enrichir)
+
+| Amélioration v4 | Intérêt |
+|-----------------|--------|
+| **Score par IP** + score serveur global | Comme SSL Labs : note par « hôte » + synthèse |
+| **Grades A+ à F** | Lecture instantanée (ex. ≥90 A, ≥70 B…) |
+| **Détail des points perdus** | « −12 DMARC manquant », « −20 Spamhaus (critique) » |
+| **Poids RBL par impact** | UCEProtect L3 / Spamhaus SBL = critique ; listes mineures = faible |
+| **FCrDNS** dans le calcul | −15 si FCrDNS KO (v4) |
+
+**Verdict :** le score /100 **existe** ; la version « SSL Labs » (grades, score par IP, pondération intelligente) est **pertinente v4** et pas encore faite.
+
+---
+
+## RBL : sous-listes, familles et niveau d’impact
+
+### Politique produit (décision OBI2)
+
+**Conserver l’affichage des sous-listes** (zen, PBL, SBL, XBL, UCEProtect L1/L2/L3…) — détail technique utile pour le diagnostic. Pas de suppression au profit d’un seul `zen`.
+
+En **plus**, v4 ajoute un **regroupement visuel par famille** :
+
+```
+▼ Spamhaus (4 sous-listes listées)     Impact : CRITIQUE
+    zen.spamhaus.org      LISTED
+    pbl.spamhaus.org      LISTED
+    sbl.spamhaus.org      LISTED
+    xbl.spamhaus.org      LISTED
+
+▼ UCEProtect (1 sous-liste)              Impact : CRITIQUE
+    dnsbl-3.uceprotect.net  LISTED
+
+▶ Spamcop (0)                            Impact : Important — OK
+```
+
+### Niveaux d’impact (v4)
+
+| Niveau | Exemples | Effet délivrabilité |
+|--------|----------|---------------------|
+| **Critique** | Spamhaus (zen/SBL/XBL), UCEProtect L2/L3, CBL, Barracuda | Blocage fréquent Gmail/Outlook |
+| **Important** | Spamcop, SORBS, PSBL | Filtres agressifs |
+| **Informatif** | UCEProtect L0/L1, listes régionales, RHSBL | Contexte ; L3 entraîne souvent L1/L2 |
+
+Le **compteur** affiche : `6 listées · 2 familles critiques` (sous-listes + synthèse).
+
+### MXToolbox vs MegaStats
+
+MXToolbox agrège l’affichage ; MegaStats montre **plus de détail** (sous-listes). Les deux peuvent être cohérents si UCEProtect L3 est listée des deux côtés. L’écart « 1 vs 6 » vient du **niveau de détail Spamhaus**, pas d’une erreur de détection.
+
+### Performance v4
+
+Scan 47 zones ≈ 113 s en v3 — **paralléliser** les requêtes DNS ou cache court par zone (TTL 5 min).
+
+---
+
+## Contrôles mail : état v3 vs v4
+
+| Contrôle | v3 | v4 |
+|----------|----|----|
+| **PTR** | ✅ `ms_mail_check_ptr()` (IP principale) | ✅ Par IP + hostname mail-rN |
+| **FCrDNS** | ❌ | ✅ Nouveau |
+| **SPF** | ✅ domaine | ✅ + IP dans le SPF |
+| **DKIM** | ✅ | ✅ par domaine / compte |
+| **DMARC** | ✅ | ✅ |
+| **HELO** | ✅ probe SMTP EHLO (`mail_helo_name`) | ✅ + cohérence HELO = hostname FCrDNS |
+| **Score /100** | ✅ basique | ✅ enrichi (grades, par IP) |
+| **RBL familles + impact** | ❌ liste plate | ✅ v4 |
 
 ---
 
@@ -220,7 +321,88 @@ Option : test SMTP `telnet` / `swaks` vers `outlook-com.olc.protection.outlook.c
 | **4.0-alpha** | 4.0.0-a | Tableau multi-IP read-only (PTR, A, SPF, DKIM, DMARC, FCrDNS, Microsoft) |
 | **4.0-beta** | 4.0.0-b | Bouton « Corriger » : A + SPF + DMARC via Zone Editor |
 | **4.0** | 4.0.0 | PTR assisté + rapport réputation + export PDF/e-mail |
-| **4.1** | 4.1.0 | API Microsoft SNDS complète, Google Postmaster hint, tests inbox multi-IP |
+| **4.1** | 4.1.0 | Score SSL Labs, RBL familles + impact, API SNDS, délisting assisté |
+| **4.2** | 4.2.0 | **Plugin cPanel** — réputation mail pour l’IP du compte connecté uniquement |
+
+---
+
+## Délisting RBL — assistant (pas de déblacklist automatique)
+
+### Ce qui n’est **pas** possible
+
+Aucun plugin WHM/cPanel ne peut **retirer une IP d’une blacklist par API** : chaque liste (Spamhaus, UCEProtect, Barracuda…) a son **portail de demande de retrait** manuel, souvent payant (UCEProtect L3) ou soumis à conditions (Spamhaus : corriger la cause d’abord).
+
+Un bouton « Déblacklister » qui ferait disparaître l’IP **sans action humaine** serait **impossible et trompeur**.
+
+### Ce qui est **pertinent v4** : assistant de délisting
+
+Pour chaque liste où l’IP est **LISTED**, MegaStats affiche :
+
+| Élément | Contenu |
+|---------|---------|
+| **Bouton « Procédure de retrait »** | Ouvre un panneau pas-à-pas |
+| **Lien direct** | Portail officiel (ex. UCEProtect removal, Spamhaus lookup) |
+| **Prérequis** | « Corriger FCrDNS », « Arrêter spam », « Attendre 24–48 h » |
+| **Modèle de ticket** | Texte copiable pour le NOC / client |
+| **Suivi** | « Revérifier dans 24 h » + cron re-scan + alerte si retirée |
+
+Exemple UCEProtect L3 :
+
+1. Corriger la cause (spam, PTR, FCrDNS)
+2. Demande payante ou attente expiration TTL (2100 s affiché MXToolbox)
+3. Lien : `https://www.uceprotect.net/en/rblcheck.php`
+4. Bouton **Revérifier maintenant** dans MegaStats
+
+Exemple Spamhaus :
+
+1. Vérifier sur `https://check.spamhaus.org/`
+2. Si PBL : souvent auto-retrait après 7 jours si comportement OK
+3. Si SBL/XBL : formulaire abuse / justification
+
+**WHM** : assistant complet + actions correctives DNS.  
+**cPanel** : procédure simplifiée + lien support hébergeur.
+
+---
+
+## Plugin cPanel utilisateur (v4.2 — plus-value confirmée)
+
+Extension **cPanel** (icône dans l’interface client) — valeur ajoutée forte pour revendeurs et hébergeurs mutualisés.
+
+### Fonctionnalités
+
+| Écran client | Contenu |
+|--------------|---------|
+| **Mon IP d’envoi** | IP dédiée du compte (pas les autres IP du serveur) |
+| **Statut RBL** | Sous-listes + familles + impact (lecture seule) |
+| **Score /100** | Score de *son* IP + domaine principal |
+| **PTR · FCrDNS · SPF · DKIM · DMARC** | ✅ / ❌ simplifié |
+| **Listée ?** | Badge rouge + **Procédure de retrait** + « Contacter le support » |
+| **HELO** | OK / KO (info) |
+
+### Technique
+
+```
+/cpanel/megastats/          # Plugin cPanel (CGI/PHP)
+  index.cgi                 # Auth session cPanel utilisateur
+  → lit IP compte (userdata, uapi)
+  → ms_mail_check_rbl($ip)  # même moteur que WHM
+  → filtre strict : refuser toute IP ≠ compte courant
+```
+
+### Sécurité
+
+- Auth **cPanel user** uniquement (pas root)
+- Pas de liste des autres comptes / IP serveur
+- Pas de modification DNS depuis cPanel (WHM root seulement)
+- Option **AdminLicence** : feature premium revendeur
+
+### Livraison
+
+| Phase | Contenu |
+|-------|---------|
+| 4.2-alpha | Page cPanel RBL + score IP |
+| 4.2 | + PTR/FCrDNS/SPF + assistant délisting |
+| 4.2+ | Widget résumé dans cPanel home |
 
 ---
 
@@ -237,13 +419,17 @@ Option : test SMTP `telnet` / `swaks` vers `outlook-com.olc.protection.outlook.c
 ## Critères d’acceptation v4.0
 
 - [ ] Tableau affiche **toutes** les IP d’envoi configurées (min. 3 IP type OBI2)
-- [ ] Colonnes PTR, A, SPF, DKIM, DMARC, FCrDNS, Microsoft avec icônes ✅ / ⚠️ / ❌
+- [ ] Colonnes PTR, A, SPF, DKIM, DMARC, FCrDNS, **Compte**, **Mail IP**, **RBL**, Microsoft avec icônes ✅ / ⚠️ / ❌
+- [ ] Checklist automatique : FCrDNS + compte cPanel + « Send mail from account IP »
+- [ ] RBL : **sous-listes conservées** + regroupement familles + niveau d’impact
+- [ ] Assistant **délisting** (liens portails + procédure + revérification)
+- [ ] Score /100 enrichi (grades, par IP)
 - [ ] FCrDNS calculé correctement (test unitaire sur IP fictive)
 - [ ] « Corriger automatiquement » crée `mail-r1`, `mail-r2`, `mail-r3` + A records sans casser SPF existant
 - [ ] Re-scan post-correction met à jour le tableau sous 60 s
 - [ ] Rapport réputation exportable (HTML + option e-mail)
 - [ ] Aucune modification DNS sans confirmation root explicite
-- [ ] Documentation WHM + entrée CHANGELOG 4.0.0
+- [ ] Plugin **cPanel** v4.2 : IP compte seule + RBL + assistant délisting
 
 ---
 
