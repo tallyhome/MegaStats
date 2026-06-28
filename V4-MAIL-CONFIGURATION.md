@@ -19,6 +19,7 @@
 | Analyser toutes les IP / une IP | v3.3 | ✅ |
 | UI RBL : procédure retrait visible, tout ouvrir/fermer, accordéons indépendants | v3.5 | ✅ |
 | Reconstruire automatiquement MailIPs | v3.5 | ✅ |
+| Régénérer mailips + mailhelo (userips, userdomains, users) | v4.1 | ✅ |
 | Plugin cPanel (IP du compte seul) | v3.3 (prévu v4.2 doc) | ✅ |
 | Bouton « Corriger automatiquement » (A, SPF, DKIM, DMARC) | v4.0 | ✅ |
 | Colonne Mail IP par ligne | v4.0 | ✅ |
@@ -92,6 +93,7 @@ templates/mail/
 | **Toutes les IP** | Met à jour la matrice multi-IP |
 | **Corriger automatiquement** | A + SPF + DKIM + DMARC via uapi (root) |
 | **Reconstruire MailIPs** | Panneau Exim → comptes cPanel → `/etc/mailips` |
+| **Régénérer mailips + mailhelo** | Carte corrective ou `php bin/rebuild-exim-maps.php` (root) |
 | **Export rapport** | `?page=mail&export=1` (HTML téléchargeable) |
 | **Plugin cPanel** | Menu **MegaStats Mail** — IP du compte uniquement |
 

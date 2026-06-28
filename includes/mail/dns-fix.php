@@ -139,6 +139,9 @@ function ms_mail_exim_needs_mailips_rebuild(array $exim): bool
     if (!($exim['mailips']['ok'] ?? false)) {
         return true;
     }
+    if (!($exim['mailhelo']['ok'] ?? false)) {
+        return true;
+    }
     if (!($exim['send_from_account_ip']['ok'] ?? false)) {
         return true;
     }

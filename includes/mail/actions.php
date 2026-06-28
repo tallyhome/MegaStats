@@ -23,7 +23,7 @@ function ms_mail_handle_post_action(array $config): ?string
         'scan', 'scan_all' => ms_mail_run_scan($config),
         'scan_ip' => ms_mail_refresh_ip($config, trim((string) ms_post('scan_ip', ''))),
         'rebuild_mailips' => (function () use ($config, &$mailipsResult): void {
-            $mailipsResult = ms_mail_rebuild_mailips();
+            $mailipsResult = ms_mail_rebuild_exim_config($config);
             if ($mailipsResult['ok']) {
                 ms_mail_run_scan($config);
                 @file_put_contents(
@@ -64,7 +64,7 @@ function ms_mail_scan_flash_message(string $code, array $config = []): string
             }
         }
 
-        return 'MailIPs reconstruit et Exim redémarré.';
+        return 'MailIPs et mailhelo régénérés, Exim rechargé.';
     }
 
     if ($code === 'ok_fix' || $code === 'err_fix') {
@@ -84,7 +84,7 @@ function ms_mail_scan_flash_message(string $code, array $config = []): string
         'ok' => 'Analyse terminée.',
         'ok_all' => 'Analyse de toutes les IP terminée.',
         'ok_ip' => 'Analyse de l\'IP terminée.',
-        'err_mailips' => 'Échec reconstruction MailIPs (root requis).',
+        'err_mailips' => 'Échec régénération mailips/mailhelo (root requis).',
         'ok_fix' => 'Correction automatique appliquée (voir détails ci-dessous).',
         'err_fix' => 'Échec correction automatique (root requis ou aucune action).',
         'csrf' => 'Jeton de sécurité invalide.',

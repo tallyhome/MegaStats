@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.1.0 — 2026-06-28
+
+### Ajouté
+- **Régénération Exim complète** : lit `/etc/userips`, `/etc/userdomains`, `/var/cpanel/users/*` → génère `/etc/mailips` **et** `/etc/mailhelo`, puis `systemctl reload exim` (fallback cPanel)
+- HELO par domaine : PTR/FCrDNS si disponible, sinon `mail-rN.domaine` + entrée wildcard `*`
+- Script CLI : `bin/rebuild-exim-maps.php`
+- Aperçu mailhelo dans la carte « actions correctives »
+
+### Modifié
+- Bouton Exim renommé : **Régénérer mailips + mailhelo**
+
 ## 4.0.1 — 2026-06-28
 
 ### Ajouté

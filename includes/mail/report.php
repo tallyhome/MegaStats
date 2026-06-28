@@ -140,10 +140,18 @@ function ms_mail_build_page_view(array $config): array
     $mailipsPreview = null;
     $mailipsRebuildNeeded = ms_mail_exim_needs_mailips_rebuild($exim);
     if ($mailipsRebuildNeeded) {
-        $entries = ms_mail_collect_mailips_entries();
+        $preview = ms_mail_preview_exim_rebuild($config);
         $mailipsPreview = [
-            'count' => count($entries),
-            'entries' => array_slice($entries, 0, 5),
+            'count' => count($preview['mailips']),
+            'entries' => array_slice($preview['mailips'], 0, 5),
+            'mailhelo_count' => count($preview['mailhelo']),
+            'mailhelo_entries' => array_slice($preview['mailhelo'], 0, 5),
+            'default_helo' => $preview['default_helo'],
+            'sources' => [
+                'userdomains' => is_file('/etc/userdomains'),
+                'userips' => is_file('/etc/userips'),
+                'cpanel_users' => is_dir('/var/cpanel/users'),
+            ],
         ];
     }
 

@@ -19,6 +19,7 @@ if (!$show) {
 $dnsLabels = $dnsFixAvailable ? ms_mail_auto_fix_action_labels($auto_fix_plan) : [];
 $fixIp = (string) ($auto_fix_plan['ip'] ?? $scan['ip'] ?? '');
 $ptrNote = (string) ($auto_fix_plan['ptr_note'] ?? '');
+$sources = $mailips_preview['sources'] ?? [];
 ?>
 
 <div class="card ms-card border-warning mb-3">
@@ -52,7 +53,12 @@ $ptrNote = (string) ($auto_fix_plan['ptr_note'] ?? '');
 
         <?php if ($mailips_rebuild_needed): ?>
         <div>
-            <h2 class="h6 fw-semibold mb-2">Exim · /etc/mailips</h2>
+            <h2 class="h6 fw-semibold mb-2">Exim · /etc/mailips + /etc/mailhelo</h2>
+            <p class="small text-secondary mb-2">
+                Sources lues : <?= !empty($sources['userdomains']) ? 'userdomains' : '' ?>
+                <?= !empty($sources['userips']) ? ' · userips' : '' ?>
+                <?= !empty($sources['cpanel_users']) ? ' · comptes cPanel' : '' ?>
+            </p>
             <?php if (!empty($exim['issues'])): ?>
             <ul class="small text-secondary mb-2">
                 <?php foreach ($exim['issues'] as $issue): ?>
@@ -61,9 +67,7 @@ $ptrNote = (string) ($auto_fix_plan['ptr_note'] ?? '');
             </ul>
             <?php endif; ?>
             <?php if ($mailips_preview !== null && ($mailips_preview['count'] ?? 0) > 0): ?>
-            <p class="small mb-2">
-                Reconstruction possible : <strong><?= (int) $mailips_preview['count'] ?></strong> entrée(s) domaine → IP → compte cPanel.
-            </p>
+            <p class="small mb-1 fw-semibold">/etc/mailips — <?= (int) $mailips_preview['count'] ?> entrée(s)</p>
             <ul class="small font-monospace text-secondary mb-3">
                 <?php foreach ($mailips_preview['entries'] ?? [] as $entry): ?>
                 <li><?= ms_e($entry['domain'] . ': ' . $entry['ip'] . ' : ' . $entry['user']) ?></li>
@@ -72,15 +76,24 @@ $ptrNote = (string) ($auto_fix_plan['ptr_note'] ?? '');
                 <li>… et <?= (int) $mailips_preview['count'] - 5 ?> autre(s)</li>
                 <?php endif; ?>
             </ul>
+            <p class="small mb-1 fw-semibold">/etc/mailhelo — <?= (int) ($mailips_preview['mailhelo_count'] ?? 0) ?> domaine(s) + défaut *</p>
+            <ul class="small font-monospace text-secondary mb-3">
+                <?php foreach ($mailips_preview['mailhelo_entries'] ?? [] as $entry): ?>
+                <li><?= ms_e($entry['domain'] . ': ' . $entry['helo']) ?></li>
+                <?php endforeach; ?>
+                <?php if (!empty($mailips_preview['default_helo'])): ?>
+                <li>*: <?= ms_e((string) $mailips_preview['default_helo']) ?></li>
+                <?php endif; ?>
+            </ul>
             <?php else: ?>
-            <p class="small text-secondary mb-3">Aucune entrée détectée dans les comptes cPanel — vérifiez /etc/userdomains.</p>
+            <p class="small text-secondary mb-3">Aucune entrée détectée — vérifiez /etc/userdomains et /etc/userips.</p>
             <?php endif; ?>
             <form method="post" action="<?= ms_e($mail_url) ?>" class="d-inline"
-                  onsubmit="return confirm('Reconstruire /etc/mailips depuis tous les comptes cPanel et redémarrer Exim ?\n\nUn backup sera créé avant écriture.');">
+                  onsubmit="return confirm('Régénérer /etc/mailips et /etc/mailhelo depuis cPanel puis recharger Exim ?\n\nBackup automatique des fichiers existants.');">
                 <?= $csrf_field ?>
                 <input type="hidden" name="mail_action" value="rebuild_mailips">
                 <button type="submit" class="btn btn-sm btn-warning text-dark fw-semibold">
-                    <i class="bi bi-arrow-repeat me-1"></i>Reconstruire /etc/mailips depuis cPanel
+                    <i class="bi bi-arrow-repeat me-1"></i>Régénérer mailips + mailhelo (systemctl reload exim)
                 </button>
             </form>
         </div>
