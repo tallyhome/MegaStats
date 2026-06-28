@@ -35,12 +35,16 @@ require MEGASTATS_ROOT . '/includes/mail/scanner.php';
 require MEGASTATS_ROOT . '/includes/mail/report.php';
 require MEGASTATS_ROOT . '/includes/router.php';
 require MEGASTATS_ROOT . '/includes/config-editor.php';
+require MEGASTATS_ROOT . '/includes/toolkit/menu.php';
+require MEGASTATS_ROOT . '/includes/toolkit/runner.php';
+require MEGASTATS_ROOT . '/includes/toolkit/page.php';
 
 $config = array_merge(
     require MEGASTATS_ROOT . '/config/app.php',
     require MEGASTATS_ROOT . '/config/monitoring.php',
     require MEGASTATS_ROOT . '/config/security.php',
     require MEGASTATS_ROOT . '/config/mail.php',
+    require MEGASTATS_ROOT . '/config/toolkit.php',
     ['alerts' => require MEGASTATS_ROOT . '/config/alerts.php']
 );
 

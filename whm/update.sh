@@ -7,6 +7,10 @@ SRC_DIR="$(cd "$PLUGIN_DIR/.." && pwd)"
 INSTALL_DIR="/usr/local/cpanel/whostmgr/docroot/cgi/megastats"
 
 chmod +x "$PLUGIN_DIR"/*.sh 2>/dev/null || true
+if [[ -d "$SRC_DIR/toolkit" ]]; then
+    chmod +x "$SRC_DIR/toolkit/server-toolkit.sh" 2>/dev/null || true
+    chmod +x "$SRC_DIR/toolkit/actions"/*.sh 2>/dev/null || true
+fi
 
 if [[ "$(id -u)" -ne 0 ]]; then
     echo "Erreur : exécutez en root." >&2

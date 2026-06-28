@@ -61,6 +61,10 @@ if (!is_file($whmLib)) {
         ms_render_config_page_whm($config);
         exit;
     }
+    if ($page === 'toolkit') {
+        ms_render_toolkit_page_whm($config);
+        exit;
+    }
     ms_start_output_buffer($config);
     $view = ms_build_dashboard($config);
     $view['auth_mode'] = 'whm';
@@ -76,10 +80,12 @@ ms_whm_require_access($config);
 $assetsBase = ms_e($config['assets_base']);
 $isMailPage = $page === 'mail';
 $isConfigPage = $page === 'config';
+$isToolkitPage = $page === 'toolkit';
 
 $whmTitle = match ($page) {
     'mail' => 'MegaStats — Délivrabilité',
     'config' => 'MegaStats — Configuration',
+    'toolkit' => 'MegaStats — Server Toolkit',
     default => 'MegaStats',
 };
 
@@ -94,6 +100,8 @@ if ($isMailPage) {
     ms_render_mail_page_whm($config);
 } elseif ($isConfigPage) {
     ms_render_config_page_whm($config);
+} elseif ($isToolkitPage) {
+    ms_render_toolkit_page_whm($config);
 } else {
     echo '<div class="container-fluid py-3 ms-whm-wrap" data-bs-theme="dark">' . "\n";
     ms_start_output_buffer($config);
@@ -111,12 +119,12 @@ WHM::footer();
 echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>' . "\n";
 if ($isMailPage) {
     echo '<script src="' . $assetsBase . '/js/mail.js"></script>' . "\n";
-} elseif (!$isConfigPage) {
+} elseif (!$isConfigPage && !$isToolkitPage) {
     echo '<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/charts.js"></script>' . "\n";
     echo '<script src="' . $assetsBase . '/js/app.js"></script>' . "\n";
 }
-if (!$isConfigPage) {
+if (!$isConfigPage && !$isToolkitPage) {
     echo '<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">' . "\n";
     echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>' . "\n";
     echo '<script>window.MegaStatsUpdate=' . json_encode([

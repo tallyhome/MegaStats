@@ -36,6 +36,10 @@ echo "    PHP cron : $PHP_BIN"
 echo "    PHP CGI  : ${PHP_CGI:-MANQUANT — auth WHM impossible}"
 
 chmod +x "$PLUGIN_DIR"/*.sh 2>/dev/null || true
+if [[ -d "$SRC_DIR/toolkit" ]]; then
+    chmod +x "$SRC_DIR/toolkit/server-toolkit.sh" 2>/dev/null || true
+    chmod +x "$SRC_DIR/toolkit/actions"/*.sh 2>/dev/null || true
+fi
 
 if [[ -z "$PHP_CGI" ]]; then
     echo "ERREUR : php-cgi introuvable. Installez ea-php82-cgi via EasyApache." >&2

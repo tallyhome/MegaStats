@@ -51,6 +51,11 @@ if (empty($whm_embedded)) {
                             <i class="bi bi-shield-check me-1"></i>Délivrabilité Email &amp; IP<?php if ($mail_score !== null): ?> <span class="badge text-bg-secondary ms-1"><?= (int) $mail_score ?></span><?php endif; ?>
                         </a>
                     <?php endif; ?>
+                    <?php if (!empty($toolkit_enabled) && !empty($toolkit_can_use)): ?>
+                        <a href="<?= ms_e($toolkit_url ?? ms_url($scriptname, ['page' => 'toolkit'])) ?>" class="btn btn-sm btn-outline-warning" title="OBI2 Server Toolkit — gestion serveur cPanel">
+                            <i class="bi bi-tools me-1"></i>Server Toolkit
+                        </a>
+                    <?php endif; ?>
                     <span class="badge text-bg-secondary">v<?= ms_e($version ?? '') ?></span>
                     <?php if (empty($whm_embedded)): ?>
                     <button type="button" class="btn btn-sm btn-outline-secondary ms-update-check"

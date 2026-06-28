@@ -43,3 +43,7 @@ Si vous **vendez** ou **donnez** MegaStats à des clients :
 ## Contact
 
 Configurez `support_email` dans `config/distribution.php` pour vos utilisateurs.
+
+## Évolution prévue (licence)
+
+Une activation optionnelle via **numéro de série** et API **AdminLicence** pourrait être ajoutée ultérieurement (validation, heartbeat, statistiques opt-in). Tant que ce n’est pas activé, le comportement reste **100 % local** comme décrit ci-dessus.

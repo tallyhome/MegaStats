@@ -79,6 +79,14 @@ function ms_config_definitions(array $config): array
             'description' => 'Liens GitHub, don et compatibilité cPanel.',
             'fields' => [],
         ],
+        'toolkit' => [
+            'file' => 'toolkit.php',
+            'label' => 'Server Toolkit',
+            'description' => 'Module OBI2 Server Toolkit (WHM root).',
+            'fields' => [
+                'toolkit_cli_path' => ['type' => 'string', 'label' => 'Chemin menu SSH', 'hint' => 'Vide = auto (/opt/megastats/toolkit/server-toolkit.sh)'],
+            ],
+        ],
     ];
 
     if (ms_is_whm_deployment($config)) {

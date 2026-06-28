@@ -8,6 +8,7 @@
 git clone https://github.com/tallyhome/MegaStats.git /opt/megastats
 cd /opt/megastats
 chmod +x whm/*.sh
+chmod +x toolkit/server-toolkit.sh toolkit/actions/*.sh 2>/dev/null || true
 ./whm/install.sh
 ```
 
@@ -42,7 +43,15 @@ Supprime AppConfig, CGI, cron, dynamicui. Option de conserver `/var/cpanel/megas
 | `/cgi/addon_megastats.cgi` | Menu Plugins (Perl WHMADDON) |
 | `/cgi/megastats/index.cgi` | Application PHP |
 | `/var/cpanel/megastats/` | Logs, métriques, cache |
+| `/opt/megastats/toolkit/` | Server Toolkit (menu SSH + scripts) |
 | `/etc/cron.d/megastats` | Collecte chaque minute |
+
+## Server Toolkit
+
+- WHM : dashboard → **Server Toolkit** ou URL `?page=toolkit`
+- SSH (root) : `/opt/megastats/toolkit/server-toolkit.sh`
+- Actions web (read-only) : rapport, audit, SSL, Exim, DNS, disque, PHP
+- Actions interactives (comptes, IP, Laravel…) : menu SSH pour l’instant
 
 ## Compatibilité
 

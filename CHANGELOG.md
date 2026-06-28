@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.0 — 2026-06-24
+
+### Ajouté
+- **OBI2 Server Toolkit v1.0** : hub WHM (`?page=toolkit`) + menu Bash SSH
+- Bouton **Server Toolkit** sur le dashboard (WHM root)
+- Actions web : rapport serveur, audit, disque, SSL, Exim, DNS, PHP, statistiques, incohérences
+- Documentation README : Server Toolkit, badge Shields.io, piste serial AdminLicence
+
 ## 3.1.6 — 2026-06-24
 
 ### Modifié
